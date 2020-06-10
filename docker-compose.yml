@@ -1,0 +1,90 @@
+version: "3.7"
+
+networks:
+    backend:
+    frontend:
+
+secrets:
+    DB_ROOT_PASSWORD:
+        file: secrets/db_root_password
+        # external: true
+    DB_PASSWORD:
+        file: secrets/db_password
+        # external: true
+
+services:
+    # TODO: add backup script
+    mariadb:
+        image: mariadb:10.3
+        hostname: mariadb
+        command: --max_allowed_packet=256M
+        restart: unless-stopped
+        networks:
+            - backend
+        volumes:
+            # make mariadb data persistent
+            - ./data/mariadb:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: ${DB_NAME}
+            MYSQL_USER: ${DB_USER}
+            MYSQL_ROOT_PASSWORD_FILE: "/run/secrets/DB_ROOT_PASSWORD"
+            MYSQL_PASSWORD_FILE: "/run/secrets/DB_PASSWORD"
+        secrets:
+            - DB_ROOT_PASSWORD
+            - DB_PASSWORD
+        
+
+    # https://hub.docker.com/_/ghost/
+    ghost:
+        image: ghost:3-alpine
+        restart: unless-stopped
+        links:
+            - mariadb
+        networks:
+            - backend
+            - frontend
+        ports:
+            - 2368:2368
+        volumes:
+            - ./data/ghost:/var/lib/ghost/content
+        environment:
+            url: ${BLOG_URL}
+            admin: ${ADMIN_URL}
+            database__client: mysql
+            database__connection__host: mariadb
+            database__connection__database: ${DB_NAME}
+            database__connection__user: ${DB_USER}
+            # TODO: add custom configuration for secure password
+            database__connection__password: ${DB_PASSWORD}
+            # mail__transport: SMTP
+            # mail__from: "Server <${ACME_EMAIL}>"
+            # mail__options__service: SMTP
+            # mail__options__host: mail
+            # mail__options__port: 25
+
+    # TODO: add mail or slack support
+
+    # https://hub.docker.com/r/bytemark/smtp
+    # mail:
+    #     image: bytemark/smtp
+    #     restart: unless-stopped
+    #     networks:
+    #         - frontend
+
+    # TODO: add portal
+    # https-portal:
+    #     image: steveltn/https-portal:1
+    #     ports:
+    #         - 80:80
+    #         - 443:443
+    #     links:
+    #         - ghost
+    #     restart: always
+    #     networks:
+    #         - frontend
+    #     volumes:
+    #         - ./https-portal:/var/lib/https-portal
+    #     environment:
+    #         DOMAINS: '${DOMAINS_GHOST} -> http://ghost:2368, ${DOMAINS_MATOMO} -> http://matomo'
+    #         # STAGE: 'production'
+

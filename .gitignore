@@ -1,0 +1,11 @@
+# dotenv environment variables file
+.env
+
+# Mounts for MariaDB, HTTPS portal and Ghost
+/data
+
+# Secrets folder for testing purposes
+/secrets
+
+# Local filesystem files
+.DS_Store
