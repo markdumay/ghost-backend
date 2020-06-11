@@ -51,6 +51,7 @@ services:
             - 2368:2368
         volumes:
             - ./data/ghost:/var/lib/ghost/content
+            - ./config/ghost/connection.js:/var/lib/ghost/current/core/server/data/db/connection.js:ro
         environment:
             - WAIT_HOSTS=mariadb:3306
             - WAIT_SLEEP_INTERVAL=5
@@ -61,14 +62,15 @@ services:
             - database__connection__host=mariadb
             - database__connection__database=${DB_NAME}
             - database__connection__user=${DB_USER}
-            # TODO: add custom configuration for secure password
-            - database__connection__password=countly
+            - database__connection__password__file=/run/secrets/db_password
             - THEMES=$THEMES
             # - mail__transport: SMTP
             # - mail__from: "Server <${ACME_EMAIL}>"
             # - mail__options__service: SMTP
             # - mail__options__host: mail
             # - mail__options__port: 25
+        secrets:
+            - db_password
 
     # TODO: add mail or slack support
 

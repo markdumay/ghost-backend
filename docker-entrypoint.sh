@@ -11,11 +11,12 @@ THEMES=$(echo "$THEMES" | tr -s '[:upper:]' '[:lower:]')
 mkdir -p "$GHOST_CONTENT"/logs/ && chown node:node "$GHOST_CONTENT"/logs/
 
 # Pull default casper theme if requested
+# TODO: identify latest casper version
 if [ "$THEMES" == 'true' ] ; then
-    echo "Downloading default theme"
+    echo "Downloading default theme (Casper v$CASPER_VERSION)"
     mkdir -p "$GHOST_CONTENT"/themes/casper/ && chown node:node "$GHOST_CONTENT"/themes/casper/
     curl -sSL "https://github.com/TryGhost/Casper/archive/$CASPER_VERSION.tar.gz" \
-        | tar -v -C "$GHOST_CONTENT/themes/casper/" -xz --strip 1
+        | tar -C "$GHOST_CONTENT/themes/casper/" -xz --strip 1
 else
     echo "Skipping downloading of default theme, set THEMES=true to override"
 fi
