@@ -45,6 +45,13 @@ function configure(dbConfig) {
         };
     }
 
+    // read database user from secret if file is specified
+    let userFile = process.env.database__connection__user__file
+    if (userFile) {
+        let db_user= readSecret(userFile)
+        dbConfig.connection.user = db_user
+    }
+
     // read database password from secret if file is specified
     let passwordFile = process.env.database__connection__password__file
     if (passwordFile) {
