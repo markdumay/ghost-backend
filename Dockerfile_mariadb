@@ -1,0 +1,27 @@
+FROM mariadb:10.3
+
+# TODO: remove nano when no longer needed
+
+# Add crontab, curl, and logrotate
+RUN set -ex; \
+	apt-get update; \
+    apt-get install -y --no-install-recommends cron; \
+    apt-get install -y --no-install-recommends curl; \
+    apt-get install -y --no-install-recommends ca-certificates; \
+    apt-get install -y --no-install-recommends logrotate; \
+    apt-get install -y --no-install-recommends nano; \
+	rm -rf /var/lib/apt/lists/*
+
+# Add scripts
+COPY config/mariadb/docker/docker-entrypoint-override.sh \
+    config/mariadb/cron/backup-full.sh \
+    config/mariadb/cron/backup-inc.sh \
+    /usr/local/bin/
+
+RUN chmod +x /usr/local/bin/docker-entrypoint-override.sh; \
+    chmod +x /usr/local/bin/backup-full.sh; \
+    chmod +x /usr/local/bin/backup-inc.sh; \
+    mkdir -p /var/mariadb/backup/
+
+# Override entrypoint with custom script
+ENTRYPOINT ["docker-entrypoint-override.sh", "docker-entrypoint.sh"]

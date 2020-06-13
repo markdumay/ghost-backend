@@ -14,14 +14,12 @@ ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.3/wait
 RUN chmod +x /wait
 
 # Override entrypoint with custom script
-COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint-override.sh
+COPY config/ghost/docker/docker-entrypoint-override.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint-override.sh; \
     chown node:node /usr/local/bin/docker-entrypoint-override.sh;
 
 USER node
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint-override.sh"]
+ENTRYPOINT ["docker-entrypoint-override.sh"]
 
 ## Add wait instruction to initialization command
-# USER 1001:0
-# USER node
 CMD /wait && node current/index.js

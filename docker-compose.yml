@@ -14,11 +14,21 @@ secrets:
     db_password:
         file: secrets/db_password
         # external: true
+    db_backup_user:
+        file: secrets/db_backup_user
+        # external: true
+    db_backup_password:
+        file: secrets/db_backup_password
+        # external: true
+
 
 services:
     # TODO: add backup script
     mariadb:
-        image: mariadb:10.3
+        # image: mariadb:10.3
+        build:
+            context: .
+            dockerfile: Dockerfile_mariadb
         hostname: mariadb
         command: --max_allowed_packet=256M
         restart: unless-stopped
@@ -27,16 +37,26 @@ services:
         volumes:
             # make mariadb data persistent
             - ./data/mariadb:/var/lib/mysql
+            # add folder with initialization script to create backup database user and password
+            - ./config/mariadb/init:/docker-entrypoint-initdb.d:ro
+            # # Add Docker entrypoint script
+            # - ./config/mariadb/docker/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint-override.sh:ro
+            # # Add cron jobs
+            # - ./config/mariadb/cron/backup_full.sh:/usr/local/bin/backup_full.sh:ro
+            # - ./config/mariadb/cron/backup_inc.sh:/usr/local/bin/backup_inc.sh:ro
         environment:
             - MYSQL_DATABASE=${DB_NAME}
             - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
             - MYSQL_USER_FILE=/run/secrets/db_user
             - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+            - BACKUP=$BACKUP
         secrets:
             - db_root_password
             - db_user
             - db_password
-        
+            - db_backup_user
+            - db_backup_password
+
 
     # https://hub.docker.com/_/ghost/
     ghost:
@@ -44,7 +64,7 @@ services:
         # image: ghost:3-alpine
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: Dockerfile_ghost
         restart: unless-stopped
         links:
             - mariadb
@@ -55,7 +75,8 @@ services:
             - 2368:2368
         volumes:
             - ./data/ghost:/var/lib/ghost/content
-            - ./config/ghost/connection.js:/var/lib/ghost/current/core/server/data/db/connection.js:ro
+            # Add support for Docker secrets
+            - ./config/ghost/db/connection.js:/var/lib/ghost/current/core/server/data/db/connection.js:ro
         environment:
             - WAIT_HOSTS=mariadb:3306
             - WAIT_SLEEP_INTERVAL=5
