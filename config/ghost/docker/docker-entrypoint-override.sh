@@ -1,8 +1,72 @@
 #!/bin/sh
 
-DOWNLOAD_GITHUB=https://github.com/TryGhost/Casper
-GITHUB_RELEASES=/TryGhost/Casper/releases/tag
-DEFAULT_CASPER_VERSION=3.0.12
+#======================================================================================================================
+# Title         : docker-entrypoint-override.sh
+# Description   : Initializes Ghost with default Casper theme
+# Author        : Mark Dumay
+# Date          : June 14th, 2020
+# Version       : 1.0.0
+# Usage         : ENTRYPOINT ["docker-entrypoint-override.sh"]
+# Repository    : https://github.com/markdumay/ghost-backend.git
+#======================================================================================================================
+
+#======================================================================================================================
+# Constants
+#======================================================================================================================
+
+GHOST_CONTENT="/var/lib/ghost/content"
+REPOSITORY="TryGhost/Casper"
+DOWNLOAD_GITHUB="https://github.com/$REPOSITORY/archive"
+GITHUB_API="https://api.github.com/repos/$REPOSITORY/releases/latest"
+INSTALL_DIR="$GHOST_CONTENT/themes/casper/"
+DEFAULT_CASPER_VERSION="3.0.12"
+
+
+#======================================================================================================================
+# Helper Functions
+#======================================================================================================================
+
+# Prints current progress to the console
+print_status () {
+    echo "[$(date -u '+%Y-%m-%d %T')] $1"
+}
+
+
+#======================================================================================================================
+# Workflow Functions
+#======================================================================================================================
+
+# Pull default casper theme if requested
+execute_download_install_casper() {
+    if [ "$THEMES" == 'true' ] ; then
+        print_status "INFO Downloading default theme (Casper)"
+
+        # Detect latest available stable restic version
+        VERSION=$(curl -s "$GITHUB_API" | grep "tag_name" | egrep -o "[0-9]+.[0-9]+.[0-9]+")
+        if [ -z "$VERSION" ] ; then
+            print_status "WARNING Could not detect Casper versions available for download, setting default value"
+            VERSION="$DEFAULT_CASPER_VERSION"
+        fi
+
+        # Download and extract latest Casper theme
+        mkdir -p "$GHOST_CONTENT"/themes/casper/ && chown node:node "$GHOST_CONTENT"/themes/casper/
+        curl -sSL "$DOWNLOAD_GITHUB/$VERSION.tar.gz" | tar -C "$INSTALL_DIR/" -xz --strip 1
+        CHECK=$(cat "$INSTALL_DIR"/package.json 2> /dev/null | grep "\"version\"" | egrep -o "[0-9]+.[0-9]+.[0-9]+")
+        
+        if [ "$CHECK" == "$VERSION" ] ; then
+            print_status "INFO Installed Casper theme: v$VERSION"
+        else
+            print_status "ERROR Could not install Casper theme: v$VERSION"
+        fi
+    else
+        print_status "INFO Skipping downloading of default theme, set THEMES=true to override"
+    fi
+}
+
+
+#======================================================================================================================
+# Main Script
+#======================================================================================================================
 
 # Set default values for flags and variables
 if [ -z "$THEMES" ]; then THEMES='false'; fi
@@ -13,28 +77,8 @@ THEMES=$(echo "$THEMES" | tr -s '[:upper:]' '[:lower:]')
 #  Create log directory
 mkdir -p "$GHOST_CONTENT"/logs/ && chown node:node "$GHOST_CONTENT"/logs/
 
-# Pull default casper theme if requested
-if [ "$THEMES" == 'true' ] ; then
-    echo "[$(date -u '+%Y-%m-%d %T')] INFO Downloading default theme (Casper)"
-    
-    # Identify latest release of Casper, revert to default value if not found
-    CASPER_TAGS=$(curl -s "$DOWNLOAD_GITHUB/tags" | egrep "a href=\"$GITHUB_RELEASES/[0-9]+.[0-9]+.[0-9]+\"")
-    LATEST_CASPER_VERSION=$(echo "$CASPER_TAGS" | head -1 | cut -c 46- | sed "s/\">//g")
-    if [ ! -z "$LATEST_CASPER_VERSION" ] ; then
-        TARGET_CASPER_VERSION="$LATEST_CASPER_VERSION"
-    else
-        echo "[$(date -u '+%Y-%m-%d %T')] WARN Could not identify latest Casper version, reverting to default value"
-        TARGET_CASPER_VERSION="$DEFAULT_CASPER_VERSION"
-    fi
-
-    # Download and extract latest Casper theme
-    echo "[$(date -u '+%Y-%m-%d %T')] INFO Targeted Casper theme: v$TARGET_CASPER_VERSION"
-    mkdir -p "$GHOST_CONTENT"/themes/casper/ && chown node:node "$GHOST_CONTENT"/themes/casper/
-    curl -sSL "https://github.com/TryGhost/Casper/archive/$TARGET_CASPER_VERSION.tar.gz" \
-        | tar -C "$GHOST_CONTENT/themes/casper/" -xz --strip 1
-else
-    echo "[$(date -u '+%Y-%m-%d %T')] INFO Skipping downloading of default theme, set THEMES=true to override"
-fi
+# Execute workflows
+execute_download_install_casper
 
 # Call parent's entry script in current script context
 . /usr/local/bin/docker-entrypoint.sh

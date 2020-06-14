@@ -1,13 +1,27 @@
 #!/bin/bash
 
 #======================================================================================================================
+# Title         : docker-entrypoint-override.sh
+# Description   : Automates local and cloud backups of mariadb
+# Author        : Mark Dumay
+# Date          : June 14th, 2020
+# Version       : 1.0.0
+# Usage         : ENTRYPOINT ["docker-entrypoint-override.sh", "docker-entrypoint.sh"]
+# Repository    : https://github.com/markdumay/ghost-backend.git
+#======================================================================================================================
+
+#======================================================================================================================
 # Constants
 #======================================================================================================================
+
 BACKUP_DIR=/var/mariadb/backup
-DOWNLOAD_GITHUB=https://github.com/restic/restic
-GITHUB_API=https://api.github.com/repos/restic/restic/releases/latest
+REPOSITORY="restic/restic"
+DOWNLOAD_GITHUB="https://github.com/$REPOSITORY/releases/download"
+GITHUB_API="https://api.github.com/repos/$REPOSITORY/releases/latest"
+INSTALL_DIR="/usr/bin/restic"
 DEFAULT_RESTIC_VERSION='0.9.6'
 TEMP_DIR=/tmp/restic
+
 
 #======================================================================================================================
 # Helper Functions
@@ -61,7 +75,7 @@ execute_download_install_restic() {
     # Download and install targeted restic binary
     OS=$(uname -s | tr -s '[:upper:]' '[:lower:]')
     ARCH=$(uname -m | sed "s/x86_64/amd64/g")
-    RESTIC_URL="${DOWNLOAD_GITHUB}/releases/download/v${VERSION}/restic_${VERSION}_${OS}_${ARCH}.bz2"
+    RESTIC_URL="${DOWNLOAD_GITHUB}/v${VERSION}/restic_${VERSION}_${OS}_${ARCH}.bz2"
     RESPONSE=$(curl -L -s "$RESTIC_URL" --write-out %{http_code} -o "$TEMP_DIR/restic.bz2")
 
     if [ "$RESPONSE" != 200 ] ; then
@@ -69,7 +83,7 @@ execute_download_install_restic() {
     else
         bunzip2 "$TEMP_DIR/restic.bz2"
         chown root:root "$TEMP_DIR"/restic && chmod +x "$TEMP_DIR"/restic
-        cp "$TEMP_DIR"/restic /usr/bin/restic
+        cp "$TEMP_DIR"/restic "$INSTALL_DIR"
         print_status "[Note] Installed $(restic version)"
     fi
 

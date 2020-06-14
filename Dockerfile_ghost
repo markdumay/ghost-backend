@@ -1,7 +1,5 @@
 FROM ghost:3-alpine
 
-ENV GHOST_CONTENT /var/lib/ghost/content
-
 # Add curl
 RUN apk update -f \
     && apk --no-cache add -f \
