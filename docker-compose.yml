@@ -20,10 +20,18 @@ secrets:
     db_backup_password:
         file: secrets/db_backup_password
         # external: true
+    restic_password:
+        file: secrets/restic_password
+        # external: true
+    STAGE_B2_ACCOUNT_ID:
+        file: secrets/B2_ACCOUNT_ID
+        # external: true
+    STAGE_B2_ACCOUNT_KEY:
+        file: secrets/B2_ACCOUNT_KEY
+        # external: true
 
 
 services:
-    # TODO: add backup script
     mariadb:
         # image: mariadb:10.3
         build:
@@ -39,24 +47,26 @@ services:
             - ./data/mariadb:/var/lib/mysql
             # add folder with initialization script to create backup database user and password
             - ./config/mariadb/init:/docker-entrypoint-initdb.d:ro
-            # # Add Docker entrypoint script
-            # - ./config/mariadb/docker/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint-override.sh:ro
-            # # Add cron jobs
-            # - ./config/mariadb/cron/backup_full.sh:/usr/local/bin/backup_full.sh:ro
-            # - ./config/mariadb/cron/backup_inc.sh:/usr/local/bin/backup_inc.sh:ro
         environment:
             - MYSQL_DATABASE=${DB_NAME}
             - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
             - MYSQL_USER_FILE=/run/secrets/db_user
             - MYSQL_PASSWORD_FILE=/run/secrets/db_password
-            - BACKUP=$BACKUP
+            - LOCAL_BACKUP=${LOCAL_BACKUP}
+            # restic settings
+            - REMOTE_BACKUP=${REMOTE_BACKUP}
+            - RESTIC_REPOSITORY=${RESTIC_REPOSITORY}
+            - RESTIC_PASSWORD_FILE=/run/secrets/restic_password
         secrets:
             - db_root_password
             - db_user
             - db_password
             - db_backup_user
             - db_backup_password
-
+            - restic_password
+            - STAGE_B2_ACCOUNT_ID
+            - STAGE_B2_ACCOUNT_KEY
+        
 
     # https://hub.docker.com/_/ghost/
     ghost:
@@ -88,7 +98,7 @@ services:
             - database__connection__database=${DB_NAME}
             - database__connection__user__file=/run/secrets/db_user
             - database__connection__password__file=/run/secrets/db_password
-            - THEMES=$THEMES
+            - THEMES=${THEMES}
             # - mail__transport: SMTP
             # - mail__from: "Server <${ACME_EMAIL}>"
             # - mail__options__service: SMTP

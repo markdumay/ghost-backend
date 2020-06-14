@@ -39,10 +39,10 @@ print_status () {
 
 # Install backup cron jobs
 execute_install_backup_cron() {
-    if [ "$BACKUP" == 'true' ] ; then
+    if [ "$LOCAL_BACKUP" == 'true' ] ; then
         mkdir -p "$BACKUP_DIR"
 
-        print_status "[Note] Adding backup cron job"
+        print_status "[Note] Adding backup cron jobs"
         print_status "[Note] View the cron logs in '/var/log/backup-*.log'"
 
         # Add cronjob for backup-inc.sh if not scheduled yet
@@ -55,6 +55,32 @@ execute_install_backup_cron() {
         CRON_FULL=$(crontab -l 2> /dev/null | grep -q "backup-full")
         if [ -z "$CRON_FULL" ] ; then
             (crontab -l 2> /dev/null; echo "0 0,12 * * * backup-full.sh >> /var/log/backup-full.log 2>&1") | crontab -
+        fi
+    fi
+}
+
+# Install restic cron jobs
+execute_install_restic_cron() {
+    if [ "$REMOTE_BACKUP" == 'true' ] ; then
+        print_status "[Note] Adding restic cron jobs"
+        print_status "[Note] View the cron log in '/var/log/restic.log'"
+
+        # Add cronjob for restic backup.sh if not scheduled yet
+        CRON_INC=$(crontab -l 2> /dev/null | grep -q "restic-remote.sh backup")
+        if [ -z "$CRON_INC"] ; then
+            (crontab -l 2> /dev/null; echo "45 * * * * restic-remote.sh backup $BACKUP_DIR >> /var/log/restic.log 2>&1") | crontab -
+        fi
+
+        # Add cronjob for restic prune if not scheduled yet
+        CRON_UPDATE=$(crontab -l 2> /dev/null | grep -q "restic prune")
+        if [ -z "$CRON_UPDATE" ] ; then
+            (crontab -l 2> /dev/null; echo "15 1 * * * restic prune >> /var/log/restic.log 2>&1") | crontab -
+        fi
+
+        # Add cronjob for restic self-update if not scheduled yet
+        CRON_UPDATE=$(crontab -l 2> /dev/null | grep -q "restic update")
+        if [ -z "$CRON_UPDATE" ] ; then
+            (crontab -l 2> /dev/null; echo "15 4 * * * restic update >> /var/log/restic.log 2>&1") | crontab -
         fi
     fi
 }
@@ -97,27 +123,21 @@ execute_download_install_restic() {
 #======================================================================================================================
 
 # Set default values for flags and variables
-if [ -z "$BACKUP" ]; then BACKUP='false'; fi
+if [ -z "$LOCAL_BACKUP" ]; then LOCAL_BACKUP='false'; fi
+if [ -z "$REMOTE_BACKUP" ]; then REMOTE_BACKUP='false'; fi
 
 # Convert selected environment variables to lower case
-BACKUP=$(echo "$BACKUP" | tr -s '[:upper:]' '[:lower:]')
-
-
-# TODO: set restic schedule
-
-# 45 * * * * . /home/admin/.restic-env; /usr/local/bin/restic_b2.sh > /dev/null 2>&1
-# 15 1 * * * /usr/local/bin/restic self-update --output /usr/local/bin/restic > /dev/null 2>&1
-
-# /usr/local/bin/restic backup /var/mariadb/backup/ && \
-# /usr/local/bin/restic forget --host "$HOSTNAME" --keep-daily 30 --prune
-
-# mail -s "$HOSTNAME backup $(test $? -eq 0 && echo 'successful' || echo 'failed') on $(date +%d-%m-%Y\ %R)" 'admin@markdumay.com' <<< "$(restic snapshots)"
+LOCAL_BACKUP=$(echo "$LOCAL_BACKUP" | tr -s '[:upper:]' '[:lower:]')
+REMOTE_BACKUP=$(echo "$REMOTE_BACKUP" | tr -s '[:upper:]' '[:lower:]')
 
 # TODO: configure logrotate
+# TODO: add notifications
+# mail -s "$HOSTNAME backup $(test $? -eq 0 && echo 'successful' || echo 'failed') on $(date +%d-%m-%Y\ %R)" 'admin@markdumay.com' <<< "$(restic snapshots)"
 
 # Execute workflows
 execute_install_backup_cron
 execute_download_install_restic
+execute_install_restic_cron
 
 # Run container as daemon
 exec "$@"
