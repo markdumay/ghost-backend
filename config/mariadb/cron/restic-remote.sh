@@ -176,7 +176,7 @@ while [ "$1" != "" ]; do
             ;;
         * )
             usage
-            terminate "Unrecognized parameter ($1)"
+            terminate "Unrecognized parameter '$1'"
     esac
     shift
 done
