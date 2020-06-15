@@ -1,0 +1,5 @@
+/var/log/mariabackup.log {
+    daily
+    maxsize 5M
+    rotate 4
+}
