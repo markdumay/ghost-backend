@@ -14,14 +14,12 @@ RUN set -ex; \
 
 # Add scripts
 COPY config/mariadb/docker/docker-entrypoint-override.sh \
-    config/mariadb/cron/backup-full.sh \
-    config/mariadb/cron/backup-inc.sh \
+    config/mariadb/cron/mariabackup-local.sh \
     config/mariadb/cron/restic-remote.sh \
     /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/docker-entrypoint-override.sh; \
-    chmod +x /usr/local/bin/backup-full.sh; \
-    chmod +x /usr/local/bin/backup-inc.sh; \
+    chmod +x /usr/local/bin/mariabackup-local.sh; \
     chmod +x /usr/local/bin/restic-remote.sh; \
     mkdir -p /var/mariadb/backup/
 

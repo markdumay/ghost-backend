@@ -105,8 +105,8 @@ Usage
 3. Submit a Pull Request with a comprehensive description of the changes
 
 ## Credits
-ghost-backend is inspired by the following code repositories and blog articles:
-* Neilpang - owner and maintainer of [acme.sh][acmesh_url]
+Ghost-backend is inspired by the following code repositories and blog articles:
+* A Fresh Cloud - [Mariabackup bash scripts][mariabackup]
 
 ## Donate
 <a href="https://www.buymeacoffee.com/markdumay" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;"></a>
@@ -125,7 +125,7 @@ Copyright © [Mark Dumay][blog]
 [docker_url]: https://docker.com
 [ghost_info]: https://ghost.org/docs/concepts/introduction/
 [ghost_url]: https://ghost.org
-
+[mariabackup]: https://afreshcloud.com/sysadmin/mariabackup-bash-scripts
 
 <!-- MARKDOWN MAINTAINED LINKS -->
 <!-- TODO: add blog link
