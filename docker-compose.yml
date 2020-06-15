@@ -43,8 +43,10 @@ services:
         networks:
             - backend
         volumes:
-            # make mariadb data persistent
-            - ./data/mariadb:/var/lib/mysql
+            # make mariadb database data, backups, and logs persistent
+            - ./data/mariadb/mysql:/var/lib/mysql
+            - ./data/mariadb/backup:/var/mariadb/backup
+            - ./data/mariadb/log:/var/log
             # add folder with initialization script to create backup database user and password
             - ./config/mariadb/init:/docker-entrypoint-initdb.d:ro
         environment:
