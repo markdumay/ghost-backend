@@ -4,7 +4,7 @@
 # Title         : restic-remote.sh
 # Description   : Executes an incremental restic backup
 # Author        : Mark Dumay
-# Date          : June 14th, 2020
+# Date          : June 15th, 2020
 # Version       : 1.0.0
 # Usage         : ./restic-inc.sh COMMAND
 # Repository    : https://github.com/markdumay/ghost-backend.git
@@ -15,7 +15,7 @@
 #======================================================================================================================
 
 SECRET_PREFIX="STAGE_"
-PRUNE_ARG="keep-daily 7"
+PRUNE_ARG='keep-daily 7'
 
 
 #======================================================================================================================
@@ -78,14 +78,12 @@ validate_env() {
         terminate "Please specify 'RESTIC_REPOSITORY' environment variable"
     fi
 
-
     if [ -z "$RESTIC_PASSWORD_FILE" ] ; then
         terminate "Please specify 'RESTIC_PASSWORD_FILE' environment variable"
     fi
 }
 
 # Export Docker secrets with '$SECRET_PREFIX' as environment variables without displaying errors
-# TODO: fix staging
 stage_env() {
     export $(grep -vH --null '^#' /run/secrets/$SECRET_PREFIX* 2> /dev/null | tr '\0' '=' \
         | sed 's/^\/run\/secrets\///g' | sed "s/$SECRET_PREFIX//g")
@@ -126,7 +124,7 @@ execute_backup() {
 # execute restic prune
 execute_prune() {
     SECONDS=0
-    restic -r "$RESTIC_REPOSITORY" --verbose forget --"$PRUNE_ARG" --prune
+    restic -r "$RESTIC_REPOSITORY" --verbose forget --${PRUNE_ARG} --prune
     RESULT="$?"
     if [ "$RESULT" == 0 ] ; then
         print_status "Completed restic pruning in $SECONDS seconds"
@@ -184,6 +182,7 @@ while [ "$1" != "" ]; do
 done
 
 # Execute workflows
+# TODO: add restore command and workflow
 case "$COMMAND" in
     backup )
         validate_env
