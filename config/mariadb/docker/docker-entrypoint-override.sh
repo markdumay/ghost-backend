@@ -135,7 +135,6 @@ if [ -z "$REMOTE_BACKUP" ]; then REMOTE_BACKUP='false'; fi
 LOCAL_BACKUP=$(echo "$LOCAL_BACKUP" | tr -s '[:upper:]' '[:lower:]')
 REMOTE_BACKUP=$(echo "$REMOTE_BACKUP" | tr -s '[:upper:]' '[:lower:]')
 
-# TODO: configure logrotate
 # TODO: add notifications
 # mail -s "$HOSTNAME backup $(test $? -eq 0 && echo 'successful' || echo 'failed') on $(date +%d-%m-%Y\ %R)" 'admin@markdumay.com' <<< "$(restic snapshots)"
 
