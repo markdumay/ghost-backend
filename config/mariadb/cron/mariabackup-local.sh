@@ -182,8 +182,7 @@ execute_backup_delta() {
 # execute full or delta backup pending command-line arguments
 execute_backup() {
     # delete backup directories older than 14 hours
-    # TODO: fix find: '/var/mariadb/backup/*': No such file or directory
-    find "$BACKUP_DIR"/* -type d -mmin +$((60*14)) -exec rm -rf {} \; 
+    find ${BACKUP_DIR}/* -type d -mmin +$((60*14)) -exec rm -rf {} \; 
 
     if [ "$DELTA_FLAG" == 'true' ] ; then
         execute_backup_delta
