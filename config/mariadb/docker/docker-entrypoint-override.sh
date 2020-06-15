@@ -48,14 +48,14 @@ execute_install_backup_cron() {
         print_status "[Note] View the cron logs in '$BACKUP_LOG'"
 
         # Add cronjob for delta backup if not scheduled yet
-        CRON_INC=$(crontab -l 2> /dev/null | grep -q "mariabackup-local.sh -d backup")
-        if [ -z "$CRON_INC"] ; then
+        CRON_INC=$(crontab -l 2> /dev/null | grep "mariabackup-local.sh -d backup")
+        if [ -z "$CRON_INC" ] ; then
             (crontab -l 2> /dev/null; \
                 echo "30 * * * * mariabackup-local.sh -d backup $BACKUP_DIR >> $BACKUP_LOG 2>&1") | crontab -
         fi
 
         # Add cronjob for full backup if not scheduled yet
-        CRON_FULL=$(crontab -l 2> /dev/null | grep -q "mariabackup-local.sh backup")
+        CRON_FULL=$(crontab -l 2> /dev/null | grep "mariabackup-local.sh backup")
         if [ -z "$CRON_FULL" ] ; then
             (crontab -l 2> /dev/null; \
                 echo "0 0,12 * * * mariabackup-local.sh backup $BACKUP_DIR >> $BACKUP_LOG 2>&1") | crontab -
@@ -70,20 +70,20 @@ execute_install_restic_cron() {
         print_status "[Note] View the cron log in '$RESTIC_LOG'"
 
         # Add cronjob for restic backup.sh if not scheduled yet
-        CRON_INC=$(crontab -l 2> /dev/null | grep -q "restic-remote.sh backup")
-        if [ -z "$CRON_INC"] ; then
+        CRON_INC=$(crontab -l 2> /dev/null | grep "restic-remote.sh backup")
+        if [ -z "$CRON_INC" ] ; then
             (crontab -l 2> /dev/null; \
                 echo "45 * * * * restic-remote.sh backup $BACKUP_DIR >> $RESTIC_LOG 2>&1") | crontab -
         fi
 
         # Add cronjob for restic prune if not scheduled yet
-        CRON_UPDATE=$(crontab -l 2> /dev/null | grep -q "restic-remote.sh prune")
+        CRON_UPDATE=$(crontab -l 2> /dev/null | grep "restic-remote.sh prune")
         if [ -z "$CRON_UPDATE" ] ; then
             (crontab -l 2> /dev/null; echo "15 1 * * * restic-remote.sh prune >> $RESTIC_LOG 2>&1") | crontab -
         fi
 
         # Add cronjob for restic self-update if not scheduled yet
-        CRON_UPDATE=$(crontab -l 2> /dev/null | grep -q "restic-remote.sh update")
+        CRON_UPDATE=$(crontab -l 2> /dev/null | grep "restic-remote.sh update")
         if [ -z "$CRON_UPDATE" ] ; then
             (crontab -l 2> /dev/null; echo "15 4 * * * restic-remote.sh update >> $RESTIC_LOG 2>&1") | crontab -
         fi
