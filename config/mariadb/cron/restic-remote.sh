@@ -2,7 +2,7 @@
 
 #======================================================================================================================
 # Title         : restic-remote.sh
-# Description   : Executes an incremental restic backup
+# Description   : Executes or restores an incremental restic backup
 # Author        : Mark Dumay
 # Date          : June 15th, 2020
 # Version       : 1.0.0
@@ -31,6 +31,8 @@ BACKUP_DIR=''
 
 # Display usage message
 usage() { 
+    echo "Create a backup or restore from a local mariadb"
+    echo
     echo "Usage: $0 COMMAND" 
     echo
     echo "Commands:"
