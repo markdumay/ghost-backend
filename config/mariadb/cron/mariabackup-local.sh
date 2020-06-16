@@ -2,7 +2,7 @@
 
 #======================================================================================================================
 # Title         : mariabackup-local.sh
-# Description   : Executes an incremental and full local mariadb backup
+# Description   : Executes or restores an incremental and full local mariadb backup
 # Author        : Mark Dumay
 # Date          : June 15th, 2020
 # Version       : 1.0.0
@@ -26,6 +26,7 @@ BACKUP_DIR=''
 USER=''
 PASSWORD=''
 DELTA_FLAG='false'
+FORCE='false'
 
 
 #======================================================================================================================
@@ -36,10 +37,11 @@ DELTA_FLAG='false'
 usage() {
     echo "Create a backup or restore from a local mariadb"
     echo
-    echo "Usage: $0 COMMAND"
+    echo "Usage: $0 [OPTIONS] COMMAND"
     echo
     echo "Options:"
     echo "  -d, --delta            Create a delta backup (instead of default full backup)"
+    echo "  -f, --force            Force restore (bypass confirmation check)"
     echo "  -u, --user             Database username (instead of input from /run/secrets/db_backup_user)"
     echo "  -p, --password         Database user password (instead of input from /run/secrets/db_backup_password)"
     echo
@@ -51,7 +53,7 @@ usage() {
 
 # Prints current progress to the console
 print_status() {
-    echo "[00] $(date -u '+%Y-%m-%d %T') $1"
+    echo "$(date -u '+%Y-%m-%d %T') $1"
 }
 
 # Display error message and terminate with non-zero error
@@ -115,6 +117,21 @@ read_credentials() {
     fi
 }
 
+confirm_operation() {
+    if [ "$FORCE" != 'true' ] ; then
+        echo
+        echo "WARNING! This operation will:"
+        echo "  - Remove all existing database files"
+        echo "  - Restore the database from available backups"
+        echo
+        read -p "Are you sure you want to continue? [y/N] " CONFIRMATION
+
+        if [ "$CONFIRMATION" != 'y' ] && [ "$CONFIRMATION" != 'Y' ] ; then
+            exit
+        fi 
+    fi
+}
+
 #======================================================================================================================
 # Workflow Functions
 #======================================================================================================================
@@ -143,6 +160,7 @@ execute_backup_full() {
 }
 
 # execute delta backup
+# TODO: initiate full backup if not available yet
 execute_backup_delta() {
     DAY_DIR="$BACKUP_DIR"/`date +%Y-%m`/
     TARGET_DIR="$DAY_DIR"`date +%d_%Hh%Mm_inc`/
@@ -191,6 +209,58 @@ execute_backup() {
     fi
 }
 
+# execute restore from latest full and delta backup
+# TODO: add restore workflow
+# TODO: docker-compose run mariadb bash
+execute_restore() {
+    SECONDS=0
+
+    # verify mysqld is not running
+    IS_SQL_RUNNING=$(ps -u mysql | grep 'mysqld')
+    if [ ! -z "$IS_SQL_RUNNING" ] ; then
+        terminate "Cannot restore whilst MariaDB is running, shutdown 'mysqld' first"
+    fi
+
+    # identify last backup (either full or incremental)
+    LAST_BACKUP=$(find ${BACKUP_DIR}/* -name 'last_completed_backup' -exec cat {} \;)
+    if [ -z "$LAST_BACKUP" ] ; then
+        terminate "No database backups found in directory '$BACKUP_DIR'"
+    fi
+
+    # identify last full backup
+    DAY_DIR=$(dirname ${LAST_BACKUP})
+    LAST_FULL_BACKUP=$(find ${DAY_DIR}/* -name '*full' | sort -V | tail -1)
+    if [ -z "$LAST_FULL_BACKUP" ] ; then
+        terminate "No full database backup found in directory '$BACKUP_DIR'"
+    fi
+
+    # empty the data directory before restoring
+    rm -rf /var/lib/mysql/*
+
+    # prepare to restore from full backup
+    mariabackup --prepare --target-dir=${LAST_FULL_BACKUP}/
+
+    # prepare to restore from incremental backup if available
+    if [ ${LAST_BACKUP: -5} == '_inc/' ] ; then
+        mariabackup --prepare --target-dir=${LAST_FULL_BACKUP}/ --incremental-dir=${LAST_BACKUP}
+    else
+        echo "No incremental"
+    fi
+
+    # restore the database
+    mariabackup --copy-back --target-dir=${LAST_FULL_BACKUP}/
+
+    RESULT="$?"
+    if [ "$RESULT" == 0 ] ; then
+        # ensure correct ownership of data directory and files
+        chown -R mysql:mysql /var/lib/mysql/
+
+        print_status "Completed restore in $SECONDS seconds, ready to start MariaDB"
+    else
+        terminate "Cannot execute restore (duration: $SECONDS seconds)"
+    fi
+}
+
 #======================================================================================================================
 # Main Script
 #======================================================================================================================
@@ -206,6 +276,9 @@ while [ "$1" != "" ]; do
     case "$1" in
         -d | --delta )
             DELTA_FLAG='true'
+            ;;
+        -f | --force )
+            FORCE='true'
             ;;
         -u | --user )
             shift
@@ -235,13 +308,15 @@ while [ "$1" != "" ]; do
 done
 
 # Execute workflows
-# TODO: add restore workflow
 case "$COMMAND" in
     backup )
         read_credentials
         execute_backup
         ;;
     restore )
+        read_credentials
+        confirm_operation
+        execute_restore
         ;;
     * )
         usage
