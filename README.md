@@ -95,6 +95,14 @@ The steps for deploying in production are slightly different than for local test
 ## Usage
 Usage
 
+### Restore
+<!-- TODO: elaborate for Docker Compose-->
+Stop Docker containers `docker-compose down'
+Enter mariadb command-mode: `docker-compose run mariadb bash'
+Start Docker containers `docker-compose down'
+
+<!-- TODO: elaborate for Docker Stack-->
+docker-compose -f docker-compose-restore.yml up
 
 ## Contributing
 1. Clone the repository and create a new branch 

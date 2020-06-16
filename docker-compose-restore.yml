@@ -1,0 +1,71 @@
+version: "3.7"
+
+networks:
+    backend:
+    frontend:
+
+secrets:
+    db_root_password:
+        file: secrets/db_root_password
+        # external: true
+    db_user:
+        file: secrets/db_user
+        # external: true
+    db_password:
+        file: secrets/db_password
+        # external: true
+    db_backup_user:
+        file: secrets/db_backup_user
+        # external: true
+    db_backup_password:
+        file: secrets/db_backup_password
+        # external: true
+    restic_password:
+        file: secrets/restic_password
+        # external: true
+    STAGE_B2_ACCOUNT_ID:
+        file: secrets/B2_ACCOUNT_ID
+        # external: true
+    STAGE_B2_ACCOUNT_KEY:
+        file: secrets/B2_ACCOUNT_KEY
+        # external: true
+
+
+services:
+    mariadb-restore:
+        # image: mariadb:10.3
+        build:
+            context: .
+            dockerfile: Dockerfile_mariadb
+        hostname: mariadb
+        command: --max_allowed_packet=256M
+        restart: "no"
+        networks:
+            - backend
+        volumes:
+            # make mariadb database data, backups, and logs persistent
+            - ./data/mariadb/mysql:/var/lib/mysql
+            - ./data/mariadb/backup:/var/mariadb/backup
+            - ./data/mariadb/log:/var/log
+            # add folder with initialization script to create backup database user and password
+            - ./config/mariadb/init:/docker-entrypoint-initdb.d:ro
+        environment:
+            - MYSQL_DATABASE=${DB_NAME}
+            - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
+            - MYSQL_USER_FILE=/run/secrets/db_user
+            - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+            - LOCAL_BACKUP=${LOCAL_BACKUP}
+            # restic settings
+            - REMOTE_BACKUP=${REMOTE_BACKUP}
+            - RESTIC_REPOSITORY=${RESTIC_REPOSITORY}
+            - RESTIC_PASSWORD_FILE=/run/secrets/restic_password
+        secrets:
+            - db_root_password
+            - db_user
+            - db_password
+            - db_backup_user
+            - db_backup_password
+            - restic_password
+            - STAGE_B2_ACCOUNT_ID
+            - STAGE_B2_ACCOUNT_KEY
+        command: mariabackup-local.sh restore /var/mariadb/backup -f
