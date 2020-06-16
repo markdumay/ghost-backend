@@ -86,6 +86,7 @@ services:
         ports:
             - 2368:2368
         volumes:
+            # Persist images, logs, settings, and themes
             - ./data/ghost:/var/lib/ghost/content
             # Add support for Docker secrets
             - ./config/ghost/db/connection.js:/var/lib/ghost/current/core/server/data/db/connection.js:ro
