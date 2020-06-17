@@ -107,7 +107,7 @@ printf password > secrets/restic_password
 
 Next you will need to configure the tokens required to connect with your cloud storage provider. Below example defines the tokens for [Backblaze B2]. `Ghost-backend` automatically stages any Docker secret starting with the prefix `STAGE_`. In below example, `STAGE_B2_ACCOUNT_ID` becomes available as `B2_ACCOUNT_ID` for restic. This [link][restic_integration] provides an overview of the tokens required for each supported cloud provider. Be sure to properly update the `XXX` values too.
 
-```
+```console
 printf XXX > secrets/STAGE_B2_ACCOUNT_ID
 printf XXX > secrets/STAGE_B2_ACCOUNT_KEY
 ```
@@ -204,13 +204,6 @@ The steps for deploying in production are slightly different than for local test
 Instead of file-based secrets, you will now create secure secrets. Docker secrets can be easily created using pipes. Do not forget to include the final `-`, as this instructs Docker to use piped input. Update the credentials as needed.
 
 ```console
-printf mail@example.com | docker secret create CF_Email -
-printf password | docker secret create CF_Token -
-printf admin | docker secret create SYNO_Username -
-printf password | docker secret create SYNO_Password -
-```
-
-
 printf password | docker secret create db_root_password -
 printf ghost | docker secret create db_user -
 printf password | docker secret create db_password -
@@ -219,6 +212,7 @@ printf password | docker secret create db_backup_password -
 printf password | docker secret create restic_password -
 printf XXX | docker secret create STAGE_B2_ACCOUNT_ID -
 printf XXX | docker secret create STAGE_B2_ACCOUNT_KEY -
+```
 
 If you do not feel comfortable copying secrets from your command line, you can use the wrapper `create_secret.sh`. This script prompts for a secret and ensures sensitive data is not displayed in your console.
 
