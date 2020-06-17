@@ -16,7 +16,7 @@
 
 BIN=/usr/local/bin
 BACKUP_DIR=/var/mariadb/backup
-BACKUP_LOG=/var/log/mariabackup.log
+BACKUP_LOG=/var/log/mysqldump.log
 RESTIC_LOG=/var/log/restic.log
 REPOSITORY="restic/restic"
 DOWNLOAD_GITHUB="https://github.com/$REPOSITORY/releases/download"
@@ -71,26 +71,19 @@ validate_backup_settings() {
 # Workflow Functions
 #======================================================================================================================
 
-# Install mariabackup cron jobs if LOCAL_BACKUP is flagged
+# Install mysqldump cron jobs if LOCAL_BACKUP is flagged
 execute_install_backup_cron() {
     if [ "$LOCAL_BACKUP" == 'true' ] ; then
         mkdir -p "$BACKUP_DIR"
 
-        print_status "[Note] Adding backup cron jobs"
+        print_status "[Note] Adding backup cron job"
         print_status "[Note] View the cron logs in '$BACKUP_LOG'"
 
-        # Add cronjob for delta backup if not scheduled yet
-        CRON_INC=$(crontab -l 2> /dev/null | grep "mariabackup-local.sh -d backup")
-        if [ -z "$CRON_INC" ] ; then
-            (crontab -l 2> /dev/null; \
-                echo "30 * * * * $BIN/mariabackup-local.sh -d backup $BACKUP_DIR >> $BACKUP_LOG 2>&1") | crontab -
-        fi
-
         # Add cronjob for full backup if not scheduled yet
-        CRON_FULL=$(crontab -l 2> /dev/null | grep "mariabackup-local.sh backup")
+        CRON_FULL=$(crontab -l 2> /dev/null | grep "mysqldump-local.sh backup")
         if [ -z "$CRON_FULL" ] ; then
             (crontab -l 2> /dev/null; \
-                echo "0 0,12 * * * $BIN/mariabackup-local.sh backup $BACKUP_DIR >> $BACKUP_LOG 2>&1") | crontab -
+                echo "0 0,12 * * * $BIN/mysqldump-local.sh backup $BACKUP_DIR >> $BACKUP_LOG 2>&1") | crontab -
         fi
     fi
 }

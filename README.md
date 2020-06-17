@@ -56,7 +56,7 @@ The project uses the following core software components:
 * [Ghost][ghost_url] - Content Management System
 * [Docker][docker_url] - Container platform (including Swarm and Compose)
 * [MariaDB][mariadb_url] - Community-developed fork of MySQL relational database
-* [Mariabackup][mariabackup] - Open source tool provided by MariaDB for performing physical online backups
+* [Mysqldump][mysqldump] - Open source tool provided by MariaDB to dump a database as SQL statements
 * [HTTPS Portal][portal_url] - Fully automated HTTPS server
 * [Restic][restic_url] - Backup program with cloud storage integration
 
@@ -144,20 +144,19 @@ docker-compose up
 After pulling the images from the Docker Hub, you should see several messages. Below excerpt shows the key messages per section.
 
 #### Enabling Automated Backups
-During boot, `ghost-backend` enables the local and remote backups in line with the `BACKUP` setting (see <a href="#step-3---update-the-environment-variables">Step 3</a>). First the cron jobs for local backups are scheduled. A delta / incremental backup is scheduled 30 minutes past every hour. Full backups are scheduled at 00:00 am and 12:00 pm daily. Next, the latest `restic` binary is downloaded and installed (`mariabackup` is already present in the parent's Docker image provided by MariaDB). Once restic is installed, it is scheduled to run 45 minutes past every hour. Restic compares the local files with the latest snapshot available in the repository. If needed, it updates the remote repository automatically using `restic_password` as encryption password (see <a href="#step-2---create-the-docker-secrets">Step 2</a>). In the background, old restic snapshots are removed daily at 01:15 am. Restic also updates itself at 04:15 am if a new binary is available. Finally, the cron daemon is fired up.
+During boot, `ghost-backend` enables the local and remote backups in line with the `BACKUP` setting (see <a href="#step-3---update-the-environment-variables">Step 3</a>). First the cron job for local backups is scheduled 30 minutes past every hour. Next, the latest `restic` binary is downloaded and installed (`mysqldump` is already present in the parent's Docker image provided by MariaDB). Once restic is installed, it is scheduled to run 45 minutes past every hour. Restic compares the local files with the latest snapshot available in the repository. If needed, it updates the remote repository automatically using `restic_password` as encryption password (see <a href="#step-2---create-the-docker-secrets">Step 2</a>). In the background, old restic snapshots are removed daily at 01:15 am. Restic also updates itself at 04:15 am if a new binary is available. Finally, the cron daemon is fired up.
 ```
 mariadb_1 | [Note] Enabling local and remote backup
-mariadb_1 | [Note] Adding backup cron jobs
-mariadb_1 | [Note] View the cron logs in '/var/log/mariabackup.log'
+mariadb_1 | [Note] Adding backup cron job
+mariadb_1 | [Note] View the cron logs in '/var/log/mysqldump.log'
 mariadb_1 | [Note] Installed restic 0.9.6 compiled with go1.13.4 on linux/amd64
 mariadb_1 | [Note] Adding restic cron jobs
 mariadb_1 | [Note] View the cron log in '/var/log/restic.log'
 mariadb_1 | [Note] Initialized cron daemon
-
 ```
 
 ### Initializing the MariaDB Database
-Once the backups are set up, the MariaDB database is initialized. MariaDB starts a temporary server, creates the Ghost schema and gives the required priviliges to the Ghost user. A user `ghost_backup` is created for the `mariabackup` cron jobs scheduled in the previous section. Once the initialization is done, the actual MariaDB server is started.
+Once the backups are set up, the MariaDB database is initialized. MariaDB starts a temporary server, creates the Ghost schema and gives the required priviliges to the Ghost user. A user `ghost_backup` is created for the `mysqldump` cron job scheduled in the previous section. Once the initialization is done, the actual MariaDB server is started.
 ```
 mariadb_1 | [Note] [Entrypoint]: Entrypoint script for MySQL Server 1:10.3.22+maria~bionic started.
 mariadb_1 | [Note] [Entrypoint]: Temporary server started.
@@ -303,7 +302,7 @@ docker-compose -f docker-compose-restore.yml up
 
 ## Credits
 Ghost-backend is inspired by the following code repositories and blog articles:
-* A Fresh Cloud - [Mariabackup bash scripts][mariabackup_bash]
+* Title - source
 
 ## Donate
 <a href="https://www.buymeacoffee.com/markdumay" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;"></a>
@@ -322,8 +321,7 @@ Copyright © [Mark Dumay][blog]
 [docker_url]: https://docker.com
 [ghost_info]: https://ghost.org/docs/concepts/introduction/
 [ghost_url]: https://ghost.org
-[mariabackup_bash]: https://afreshcloud.com/sysadmin/mariabackup-bash-scripts
-[mariabackup]: https://mariadb.com/kb/en/mariabackup-overview/
+[mysqldump]: https://mariadb.com/kb/en/mysqldump/
 [mariadb_url]: https://mariadb.com
 [restic_url]: https://restic.net
 [restic_integration]: https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html
