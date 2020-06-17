@@ -24,10 +24,10 @@ secrets:
         file: secrets/restic_password
         # external: true
     STAGE_B2_ACCOUNT_ID:
-        file: secrets/B2_ACCOUNT_ID
+        file: secrets/STAGE_B2_ACCOUNT_ID
         # external: true
     STAGE_B2_ACCOUNT_KEY:
-        file: secrets/B2_ACCOUNT_KEY
+        file: secrets/STAGE_B2_ACCOUNT_KEY
         # external: true
 
 
@@ -50,13 +50,13 @@ services:
             # add folder with initialization script to create backup database user and password
             - ./config/mariadb/init:/docker-entrypoint-initdb.d:ro
         environment:
+            # database settings
             - MYSQL_DATABASE=${DB_NAME}
             - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
             - MYSQL_USER_FILE=/run/secrets/db_user
             - MYSQL_PASSWORD_FILE=/run/secrets/db_password
-            - LOCAL_BACKUP=${LOCAL_BACKUP}
-            # restic settings
-            - REMOTE_BACKUP=${REMOTE_BACKUP}
+            # backup settings
+            - BACKUP=none
             - RESTIC_REPOSITORY=${RESTIC_REPOSITORY}
             - RESTIC_PASSWORD_FILE=/run/secrets/restic_password
         secrets:

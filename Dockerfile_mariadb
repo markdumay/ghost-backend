@@ -31,5 +31,5 @@ RUN chmod +x /usr/local/bin/docker-entrypoint-override.sh; \
     chown root:root /etc/logrotate.d/mariabackuplog; \
     mkdir -p /var/mariadb/backup/
 
-# Override entrypoint with custom script
+# Add additional, custom entrypoint script
 ENTRYPOINT ["docker-entrypoint-override.sh", "docker-entrypoint.sh"]

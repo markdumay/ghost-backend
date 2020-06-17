@@ -24,10 +24,10 @@ secrets:
         file: secrets/restic_password
         # external: true
     STAGE_B2_ACCOUNT_ID:
-        file: secrets/B2_ACCOUNT_ID
+        file: secrets/STAGE_B2_ACCOUNT_ID
         # external: true
     STAGE_B2_ACCOUNT_KEY:
-        file: secrets/B2_ACCOUNT_KEY
+        file: secrets/STAGE_B2_ACCOUNT_KEY
         # external: true
 
 
@@ -50,13 +50,13 @@ services:
             # add folder with initialization script to create backup database user and password
             - ./config/mariadb/init:/docker-entrypoint-initdb.d:ro
         environment:
+            # database settings
             - MYSQL_DATABASE=${DB_NAME}
             - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
             - MYSQL_USER_FILE=/run/secrets/db_user
             - MYSQL_PASSWORD_FILE=/run/secrets/db_password
-            - LOCAL_BACKUP=${LOCAL_BACKUP}
-            # restic settings
-            - REMOTE_BACKUP=${REMOTE_BACKUP}
+            # backup settings
+            - BACKUP=${BACKUP}
             - RESTIC_REPOSITORY=${RESTIC_REPOSITORY}
             - RESTIC_PASSWORD_FILE=/run/secrets/restic_password
         secrets:
@@ -91,9 +91,7 @@ services:
             # Add support for Docker secrets
             - ./config/ghost/db/connection.js:/var/lib/ghost/current/core/server/data/db/connection.js:ro
         environment:
-            - WAIT_HOSTS=mariadb:3306
-            - WAIT_SLEEP_INTERVAL=5
-            - WAIT_HOSTS_TIMEOUT=300            
+            # core ghost settings
             - url=http://${DOMAINS_BLOG}
             - admin=http://${DOMAINS_ADMIN}
             - database__client=mysql
@@ -101,7 +99,13 @@ services:
             - database__connection__database=${DB_NAME}
             - database__connection__user__file=/run/secrets/db_user
             - database__connection__password__file=/run/secrets/db_password
+            # boot dependencies
+            - WAIT_HOSTS=mariadb:3306
+            - WAIT_SLEEP_INTERVAL=5
+            - WAIT_HOSTS_TIMEOUT=300            
+            # indicate wether the default Ghost theme (Casper) should be installed
             - THEMES=${THEMES}
+            # notification settings
             # - mail__transport: SMTP
             # - mail__from: "Server <${ACME_EMAIL}>"
             # - mail__options__service: SMTP

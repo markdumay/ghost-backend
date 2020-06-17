@@ -35,12 +35,43 @@ print_status () {
     echo "$(date -u '+%Y-%m-%d %T') 0 $1"
 }
 
+# Validate and initialize local & remote backup settings
+validate_backup_settings() {
+    # Set default value if needed
+    if [ -z "$BACKUP" ]; then BACKUP='none'; fi
+
+    # Convert environment variables to lower case
+    BACKUP=$(echo "$BACKUP" | tr -s '[:upper:]' '[:lower:]')
+
+    # Set backup flags based upon $BACKUP setting
+    case "$BACKUP" in
+        none )
+            LOCAL_BACKUP='false'
+            REMOTE_BACKUP='false'
+            print_status "[Info] Disabling backups"
+            ;;
+        local )
+            LOCAL_BACKUP='true'
+            REMOTE_BACKUP='false'
+            print_status "[Note] Enabling local backup"
+            ;;
+        remote )
+            LOCAL_BACKUP='true'
+            REMOTE_BACKUP='true'
+            print_status "[Note] Enabling local and remote backup"
+            ;;
+        * )
+            LOCAL_BACKUP='false'
+            REMOTE_BACKUP='false'
+            print_status "[Warning] Backup setting not recognized, disabling all backups"
+    esac
+}
 
 #======================================================================================================================
 # Workflow Functions
 #======================================================================================================================
 
-# Install backup cron jobs
+# Install mariabackup cron jobs if LOCAL_BACKUP is flagged
 execute_install_backup_cron() {
     if [ "$LOCAL_BACKUP" == 'true' ] ; then
         mkdir -p "$BACKUP_DIR"
@@ -64,7 +95,7 @@ execute_install_backup_cron() {
     fi
 }
 
-# Install restic cron jobs
+# Install restic cron jobs if REMOTE_BACKUP is flagged
 execute_install_restic_cron() {
     if [ "$REMOTE_BACKUP" == 'true' ] ; then
         print_status "[Note] Adding restic cron jobs"
@@ -123,15 +154,17 @@ execute_download_install_restic() {
     rm -rf "$TEMP_DIR"
 }
 
-# Initialize cron daemon
+# Initialize cron daemon if either local backup or remote backup is flagged
 execute_start_cron() {
-    update-rc.d cron defaults
-    /etc/init.d/cron start
-    CRON_RUNNING=$(service cron status | grep 'cron is running')
-    if [ ! -z "$CRON_RUNNING" ] ; then
-        print_status "[Note] Initialized cron daemon"
-    else
-        print_status "[Error] Cron daemon not running / initialized"
+    if [ "$LOCAL_BACKUP" == 'true' ] || [ "$REMOTE_BACKUP" == 'true' ] ; then
+        update-rc.d cron defaults
+        /etc/init.d/cron start
+        CRON_RUNNING=$(service cron status | grep 'cron is running')
+        if [ ! -z "$CRON_RUNNING" ] ; then
+            print_status "[Note] Initialized cron daemon"
+        else
+            print_status "[Error] Cron daemon not running / initialized"
+        fi
     fi
 }
 
@@ -139,29 +172,12 @@ execute_start_cron() {
 # Main Script
 #======================================================================================================================
 
-# Set default values for flags and variables
-if [ -z "$LOCAL_BACKUP" ]; then LOCAL_BACKUP='false'; fi
-if [ -z "$REMOTE_BACKUP" ]; then REMOTE_BACKUP='false'; fi
-
-# Convert selected environment variables to lower case
-LOCAL_BACKUP=$(echo "$LOCAL_BACKUP" | tr -s '[:upper:]' '[:lower:]')
-REMOTE_BACKUP=$(echo "$REMOTE_BACKUP" | tr -s '[:upper:]' '[:lower:]')
-
-# TODO: add notifications
-# mail -s "$HOSTNAME backup $(test $? -eq 0 && echo 'successful' || echo 'failed') on $(date +%d-%m-%Y\ %R)" 'admin@markdumay.com' <<< "$(restic snapshots)"
-
 # Execute workflows
-IS_SQL_RUNNING=$(ps -u mysql | grep 'mysqld')
-if [ ! -z "$IS_SQL_RUNNING" ] ; then
-    print_status "[Note] Running in daemon-mode"
-    execute_install_backup_cron
-    execute_download_install_restic
-    execute_install_restic_cron
-    execute_start_cron
-else
-    print_status "[Note] Running in command-mode, cron jobs not installed"
-    execute_download_install_restic
-fi
+validate_backup_settings
+execute_install_backup_cron
+execute_download_install_restic
+execute_install_restic_cron
+execute_start_cron
 
 # Run container as daemon
 exec "$@"
