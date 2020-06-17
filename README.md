@@ -323,6 +323,7 @@ Copyright © [Mark Dumay][blog]
 [ghost_url]: https://ghost.org
 [mysqldump]: https://mariadb.com/kb/en/mysqldump/
 [mariadb_url]: https://mariadb.com
+[portal_url]: https://github.com/SteveLTN/https-portal
 [restic_url]: https://restic.net
 [restic_integration]: https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html
 
