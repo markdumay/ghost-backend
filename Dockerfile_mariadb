@@ -14,21 +14,21 @@ RUN set -ex; \
 
 # Add scripts
 COPY config/mariadb/docker/docker-entrypoint-override.sh \
-    config/mariadb/cron/mariabackup-local.sh \
+    config/mariadb/cron/mysqldump-local.sh \
     config/mariadb/cron/restic-remote.sh \
     /usr/local/bin/
 
 # Add logrotate configurations
-COPY config/mariadb/logrotate/mariabackuplog config/mariadb/logrotate/resticlog /etc/logrotate.d/
+COPY config/mariadb/logrotate/mysqldumplog config/mariadb/logrotate/resticlog /etc/logrotate.d/
 
 # Set ownership and privileges
 RUN chmod +x /usr/local/bin/docker-entrypoint-override.sh; \
-    chmod +x /usr/local/bin/mariabackup-local.sh; \
+    chmod +x /usr/local/bin/mysqldump-local.sh; \
     chmod +x /usr/local/bin/restic-remote.sh; \
     chmod 644 /etc/logrotate.d/resticlog; \
     chown root:root /etc/logrotate.d/resticlog; \
-    chmod 644 /etc/logrotate.d/mariabackuplog; \
-    chown root:root /etc/logrotate.d/mariabackuplog; \
+    chmod 644 /etc/logrotate.d/mysqldumplog; \
+    chown root:root /etc/logrotate.d/mysqldumplog; \
     mkdir -p /var/mariadb/backup/
 
 # Add additional, custom entrypoint script

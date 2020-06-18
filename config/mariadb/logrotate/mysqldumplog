@@ -1,4 +1,4 @@
-/var/log/mariabackup.log {
+/var/log/mysqldump.log {
     daily
     maxsize 5M
     rotate 4
