@@ -45,7 +45,7 @@
 
 
 ## About
-[Ghost][ghost_info] is a popular open source Content Management System (CMS) based on Node.js. It was founded in 2013 and has seen more than 2 million installs to date. The team behind Ghost offers a managed service that gets you started in minutes. However, in this tutorial we will be looking into self-hosting Ghost as a back-end service on a Virtual Private Server (VPS). The final configuration aims to be both secure and scaleable.
+[Ghost][ghost_info] is a popular open source Content Management System (CMS) based on Node.js. It was founded in 2013 and has seen more than 2 million installs to date. The team behind Ghost offers a managed service that gets you started in minutes. However, in this guide we will be looking into self-hosting Ghost as a back-end service on a Virtual Private Server (VPS). The final configuration aims to be both secure and scaleable.
 
 <!-- TODO: add tutorial deep-link 
 Detailed background information is available on the author's [personal blog][blog].
@@ -53,11 +53,11 @@ Detailed background information is available on the author's [personal blog][blo
 
 ## Built With
 The project uses the following core software components:
-* [Ghost][ghost_url] - Content Management System
 * [Docker][docker_url] - Container platform (including Swarm and Compose)
-* [MariaDB][mariadb_url] - Community-developed fork of MySQL relational database
-* [Mysqldump][mysqldump] - Open source tool provided by MariaDB to dump a database as SQL statements
+* [Ghost][ghost_url] - Content Management System
 * [HTTPS Portal][portal_url] - Fully automated HTTPS server
+* [MariaDB][mariadb_url] - Community-developed fork of MySQL relational database
+* [Mysqldump][mysqldump] - Open-source tool provided by MariaDB to export a database
 * [Restic][restic_url] - Backup program with cloud storage integration
 
 ## Prerequisites
@@ -67,8 +67,7 @@ Ghost-backend can run on a local machine for testing purposes or in a production
 Ghost is a relatively light-weight application that requires 1 GB of memory. 
 
 ### Host Operating System
-<!-- TODO: check Ubuntu 20.04 -->
-Most VPS providers offer several Linux distributions to be installed on your VPS. Although Docker and Ghost are compatible with many of them, Ghost recommends Ubuntu 18.04 LTS. The Long Time Support (LTS) edition is the most stable version and is the recommended environment for a production system.
+Most VPS providers offer several Linux distributions to be installed on your VPS. Although Docker and Ghost are compatible with many of them, Ghost recommends Ubuntu 16.04 LTS or Ubuntu 18.04 LTS. The Long Time Support (LTS) edition is the most stable version and is the recommended environment for a production system.
 
 ### Other Prerequisites
 * **A registered domain name is required** - Not only will this help people to find your blog, but it is also required for configuring SSL certificates to enable secure traffic via https. You should have the ability to manually configure DNS entries for your domain too.
@@ -93,7 +92,7 @@ cd ghost-backend
 ```
 
 ### Step 2 - Create Docker Secrets
-As Docker-compose does not support external Swarm secrets, we will create local secret files for testing purposes. 
+As `docker-compose` does not support external Swarm secrets, we will create local secret files for testing purposes. 
 
 ```console
 mkdir secrets
@@ -131,7 +130,7 @@ The `.env` file specifies eight variables. Adjust them as needed:
 | **ADMIN_EMAIL**       | `admin@example.com` | Email address for notifications from Ghost and Let's Encrypt.
 | **THEMES**            | `true`              | Indicates wether the default Ghost theme (Casper) should be installed.
 | **BACKUP**            | `remote`            | Indicates wether to schedule backups automatically. Settings can be either `none` for no backups, `local` for local backups only, or `remote` for both local and remote backups.
-| **RESTIC_REPOSITORY** | `b2:bucket-name:/`  | Email address for notifications from Ghost and Let's Encrypt.
+| **RESTIC_REPOSITORY** | `b2:bucketname:/`   | Storage provider and bucket name of the remote repository. For Backblaze B2, the full identifier is `b2:bucketname:path/to/repo`. The identifier for other storage providers can be found [here][restic_integration].
 
 
 ### Step 4 - Run Docker Service
@@ -144,7 +143,7 @@ docker-compose up
 After pulling the images from the Docker Hub, you should see several messages. Below excerpt shows the key messages per section.
 
 #### Enabling Automated Backups
-During boot, `ghost-backend` enables the local and remote backups in line with the `BACKUP` setting (see <a href="#step-3---update-the-environment-variables">Step 3</a>). First the cron job for local backups is scheduled 30 minutes past every hour. Next, the latest `restic` binary is downloaded and installed (`mysqldump` is already present in the parent's Docker image provided by MariaDB). Once restic is installed, it is scheduled to run 45 minutes past every hour. Restic compares the local files with the latest snapshot available in the repository. If needed, it updates the remote repository automatically using `restic_password` as encryption password (see <a href="#step-2---create-the-docker-secrets">Step 2</a>). In the background, old restic snapshots are removed daily at 01:15 am. Restic also updates itself at 04:15 am if a new binary is available. Finally, the cron daemon is fired up.
+During boot, `ghost-backend` enables the local and remote backups in line with the `BACKUP` setting (see <a href="#step-3---update-the-environment-variables">Step 3</a>). First the cron job using `mysqldump` for local backups is scheduled 30 minutes past every hour. Next, the latest `restic` binary is downloaded and installed (`mysqldump` is already present in the parent's Docker image provided by MariaDB). Once restic is installed, it is scheduled to run 45 minutes past every hour. Restic compares the local files with the latest snapshot available in the repository. If needed, it updates the remote repository automatically using `restic_password` as encryption password (see <a href="#step-2---create-the-docker-secrets">Step 2</a>). In the background, old restic snapshots are removed daily at 01:15 am. Restic also updates itself at 04:15 am if a new binary is available. Finally, the cron daemon is fired up.
 ```
 mariadb_1 | [Note] Enabling local and remote backup
 mariadb_1 | [Note] Adding backup cron job
@@ -156,7 +155,7 @@ mariadb_1 | [Note] Initialized cron daemon
 ```
 
 ### Initializing the MariaDB Database
-Once the backups are set up, the MariaDB database is initialized. MariaDB starts a temporary server, creates the Ghost schema and gives the required priviliges to the Ghost user. A user `ghost_backup` is created for the `mysqldump` cron job scheduled in the previous section. Once the initialization is done, the actual MariaDB server is started.
+Once the backups are set up, the MariaDB database is initialized. MariaDB starts as a temporary server, creates the Ghost database schema and gives the required priviliges to the designated `ghost` database user. A user `ghost_backup` is created for the `mysqldump` cron job scheduled in the previous section as well. Once the initialization is done, the actual MariaDB server is started.
 ```
 mariadb_1 | [Note] [Entrypoint]: Entrypoint script for MySQL Server 1:10.3.22+maria~bionic started.
 mariadb_1 | [Note] [Entrypoint]: Temporary server started.
@@ -180,11 +179,11 @@ The `docker-compose` configuration instructs Ghost to wait for the database to b
 ghost_1 | docker-compose-wait - Everything's fine, the application can now start!
 ghost_1 | INFO Creating table: [...]
 ghost_1 | INFO Model: [...]
-ghost_1 | [INFO Relation: [...]
+ghost_1 | INFO Relation: [...]
 ```
 
 ### Starting the Ghost Server
-Once the data is available, Ghost will start running in production mode. Typically the initial run takes up to a minute. The boot time is drastically reduced if the data is already available. You can now access Ghost at `http://example.com` and setup your (administrative) user(s).
+Once the data is available, Ghost will start running in production mode. Typically the initial run takes up to a minute. The boot time is drastically reduced when reconnecting to an existing database. You can now access Ghost at `http://example.com` and setup your (administrative) user(s).
 ```
 ghost_1    | [2020-06-17 11:45:40] INFO Ghost is running in production...
 ghost_1    | [2020-06-17 11:45:40] INFO Your site is now available on http://example.com
@@ -231,13 +230,21 @@ The `docker-compose.yml` in the repository defaults to set up for local testing.
 
 ```Dockerfile
 secrets:
-    CF_Email:
+    db_root_password:
         external: true
-    CF_Token:
+    db_user:
         external: true
-    SYNO_Username:
+    db_password:
         external: true
-    SYNO_Password:
+    db_backup_user:
+        external: true
+    db_backup_password:
+        external: true
+    restic_password:
+        external: true
+    STAGE_B2_ACCOUNT_ID:
+        external: true
+    STAGE_B2_ACCOUNT_KEY:
         external: true
 ```
 
@@ -245,8 +252,8 @@ secrets:
 <!-- Check variables -->
 *Unchanged, however, set DOMAINS_BLOG, DOMAINS_ADMIN, and TARGET to production once everything is working properly*
 
-### Step 4 - Run Docker Service
-The Docker service will be deployed to a Docker Stack in production. Unlike Docker Compose, Docker Stack does not automatically create local folders. Create empty folders for the `mariadb` and `ghost` data. Next, deploy the Docker Stack using `docker-compose` as input. This ensures the environment variables are parsed correctly.
+### Step 4 - Run the Docker Service
+The Docker services will be deployed to a Docker Stack in production. Unlike Docker Compose, Docker Stack does not automatically create local folders. Create empty folders for the `mariadb` and `ghost` data. Next, deploy the Docker Stack using `docker-compose` as input. This ensures the environment variables are parsed correctly.
 
 
 ```console
@@ -263,19 +270,26 @@ Run the following command to inspect the status of the Docker Stack.
 docker stack services ghost-backend
 ```
 
-You should see the value `1/1` for `REPLICAS` for the Synology TLS service if the stack was initialized correctly. It might take a while before the services are up and running, so simply repeat the command after a few minutes if needed.
+<!-- TODO: update this section -->
+You should see the value `1/1` for `REPLICAS` for the `mariadb` and `ghost` services if the stack was initialized correctly. It might take a while before the services are up and running, so simply repeat the command after a few minutes if needed.
 
 ```
 ID  NAME                MODE        REPLICAS    IMAGE                               PORTS
 *** ghost-backend_acme   replicated  1/1         markdumay/ghost-backend:2.8.6
 ```
 
-You can view the service log with `docker service logs ghost-backend_acme` once the service is up and running. Refer to the paragraph <a href="#step-4---run-with-docker-compose">Step 4 - Run with Docker Compose</a> for validation of the logs.
+You can view the service log with `docker service logs ghost-backend_acme` once the service is up and running. Refer to the paragraph <a href="#step-4---run-docker-service">Step 4 - Run with Docker Compose</a> for validation of the logs.
 
 Debugging swarm services can be quite challenging. If for some reason your service does not initiate properly, you can get its task ID with `docker service ps ghost-backend_acme`. Running `docker inspect <task-id>` might give you some clues to what is happening. Use `docker stack rm ghost-backend` to remove the docker stack entirely.
 
 ## Usage
-Usage
+Open your internet browser and navigate to the Ghost admin page. The default value is `example.test/ghost` or `example.com/ghost` pending you are in test mode or production. The site's certificate is self-signed in a local setup, so you might need to instruct your internet browser to trust this certificate. The site should now display the setup screen of Ghost and will ask you to set up an administrative user. 
+
+![Ghost setup screen][image_setup]
+
+Once you have setup your administritative account and finished configuring Ghost, you can navigate to the main url at either `example.test` or `example.com`. Ghost is now ready for use.
+
+![Ghost home screen][image_home]
 
 ### Restore
 <!-- TODO: elaborate for Docker Compose-->
@@ -328,3 +342,7 @@ Copyright © [Mark Dumay][blog]
 [blog]: https://github.com/markdumay
 [repository]: https://github.com/markdumay/ghost-backend.git
 [ubuntu-docker]: https://github.com/markdumay/ubuntu-docker
+
+<!-- MARKDOWN IMAGES -->
+[image_setup]: images/ghost-setup.png
+[image_home]: images/ghost-home.png
