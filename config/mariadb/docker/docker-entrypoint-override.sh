@@ -83,7 +83,7 @@ execute_install_backup_cron() {
         CRON_FULL=$(crontab -l 2> /dev/null | grep "mysqldump-local.sh backup")
         if [ -z "$CRON_FULL" ] ; then
             (crontab -l 2> /dev/null; \
-                echo "0 0,12 * * * $BIN/mysqldump-local.sh backup $BACKUP_DIR >> $BACKUP_LOG 2>&1") | crontab -
+                echo "0,30 * * * * $BIN/mysqldump-local.sh backup $BACKUP_DIR >> $BACKUP_LOG 2>&1") | crontab -
         fi
     fi
 }
