@@ -45,8 +45,10 @@ services:
         volumes:
             # make mariadb database data, backups, and logs persistent
             - ./data/mariadb/mysql:/var/lib/mysql
-            - ./data/mariadb/backup:/var/mariadb/backup
+            - ./data/mariadb/backup:/var/backup/mariadb
             - ./data/mariadb/log:/var/log
+            # cross-reference Ghost images, logs, settings, and themes for remote backup
+            - ./data/ghost:/var/backup/ghost
             # add folder with initialization script to create backup database user and password
             - ./config/mariadb/init:/docker-entrypoint-initdb.d:ro
         environment:
@@ -86,9 +88,9 @@ services:
         ports:
             - 2368:2368
         volumes:
-            # Persist images, logs, settings, and themes
+            # make Ghost images, logs, settings, and themes persistent
             - ./data/ghost:/var/lib/ghost/content
-            # Add support for Docker secrets
+            # add support for Docker secrets
             - ./config/ghost/db/connection.js:/var/lib/ghost/current/core/server/data/db/connection.js:ro
         environment:
             # core ghost settings
