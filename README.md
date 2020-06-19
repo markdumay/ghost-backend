@@ -2,7 +2,7 @@
 
 <!-- Tagline -->
 <p align="center">
-    <b>Deploy Ghost Blog as Back-End Docker Service</b>
+    <b>Deploy a Ghost Blog as Back-End Docker Service</b>
     <br />
 </p>
 
@@ -283,22 +283,38 @@ You can view the service log with `docker service logs ghost-backend_acme` once 
 Debugging swarm services can be quite challenging. If for some reason your service does not initiate properly, you can get its task ID with `docker service ps ghost-backend_acme`. Running `docker inspect <task-id>` might give you some clues to what is happening. Use `docker stack rm ghost-backend` to remove the docker stack entirely.
 
 ## Usage
+
+### Setting Up a Ghost Administrator
 Open your internet browser and navigate to the Ghost admin page. The default value is `example.test/ghost` or `example.com/ghost` pending you are in test mode or production. The site's certificate is self-signed in a local setup, so you might need to instruct your internet browser to trust this certificate. The site should now display the setup screen of Ghost and will ask you to set up an administrative user. 
 
 ![Ghost setup screen][image_setup]
 
-Once you have setup your administritative account and finished configuring Ghost, you can navigate to the main url at either `example.test` or `example.com`. Ghost is now ready for use.
+Once you have set up your administritative account and finished configuring Ghost, you can navigate to the main site at either `example.test` or `example.com`. Ghost is now ready for use.
 
 ![Ghost home screen][image_home]
 
-### Restore
-<!-- TODO: elaborate for Docker Compose-->
-Stop Docker containers `docker-compose down'
-Enter mariadb command-mode: `docker-compose run mariadb bash'
-Start Docker containers `docker-compose down'
+### Restoring the Ghost Database
+If enabled in the environment settings, *ghost-backend* creates local backups of the database every 30 minutes. See the `BACKUP` setting in <a href="#step-3---update-the-environment-variables">Step 3</a> on how to enable this. Under the hood, the script `mysqldump-local.sh` embedded in the `mariadb` container exports the Ghost data to a file in the `/var/backup/mariadb` folder. The same script can also be used to restore the database. To do so, connect to the shell of your running mariadb container by running below command from your host.
+```
+docker exec -it ghost-backend_mariadb_1 bash
+```
 
-<!-- TODO: elaborate for Docker Stack-->
-docker-compose -f docker-compose-restore.yml up
+From within the container, run the following command to restore the Ghost database from the latest backup available in `/var/backup/mariadb`. You can replace the backup path with another path if needed.
+
+```
+mysqldump-local.sh restore /var/backup/mariadb
+```
+
+By default, `mysqldump-local.sh` uses the latest available backup. You can specify a specific file using the `-b` flag.
+
+Once the operation is confirmed, all existing data of the Ghost database is replaced with the content from the backup file. When completed, the scripts should return below message:
+
+```
+Completed restore from '/var/backup/mariadb/ghost_backup_YYYYMMDD_HHhMMmSSs.sql' in 2 seconds
+```
+
+You can now exit the container with the command `exit`. Finally, restart the `ghost` container to ensure Ghost works correctly with the restored data.
+
 
 ## Contributing
 1. Clone the repository and create a new branch 
