@@ -1,4 +1,4 @@
-# Package
+# ghost-backend
 
 <!-- Tagline -->
 <p align="center">
