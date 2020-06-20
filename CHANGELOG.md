@@ -1,0 +1,37 @@
+# Changelog
+
+## v0.5 (20/06/2020)
+- [Adjusted title](https://github.com/markdumay/ghost-backend/commit/51642572112faa7ad393c28943c38e71288a741a) - @markdumay
+- [Added section on restoring the Ghost database](https://github.com/markdumay/ghost-backend/commit/263fa73babab34051c4655220e75e8bda28f3de5) - @markdumay
+- [Fixed schedule of local backup](https://github.com/markdumay/ghost-backend/commit/63fa91d6a0d114b9a52d4729d7b17b9273ca440f) - @markdumay
+- [Added Ghost data to remote backup](https://github.com/markdumay/ghost-backend/commit/2acb474df336b670b3a074356aa5cd281be7a2ad) - @markdumay
+- [Revised deployment section](https://github.com/markdumay/ghost-backend/commit/0cc25bec0bf3cbeb64711dddadd4cb93b0503f59) - @markdumay
+- [Fixed layout of Docker secret instructions](https://github.com/markdumay/ghost-backend/commit/5bb95c7f8705f328be4220358389f32840f1a23d) - @markdumay
+- [Fixed portal link](https://github.com/markdumay/ghost-backend/commit/c129fb616dfbdb6d5baa2a019ffb3649928d49b1) - @markdumay
+- [Replaced mariabackup with mysqldump](https://github.com/markdumay/ghost-backend/commit/acc83fb09ab5e63873532c00eb1f34616cb5588b) - @markdumay
+- [Added initial version of 'testing' section](https://github.com/markdumay/ghost-backend/commit/a593c0cd749964706570ce8b10e01b3df1a8cf07) - @markdumay
+- [Changed backup options to none, local, remote](https://github.com/markdumay/ghost-backend/commit/6db01abbe378c39a1ecba62c44fd10db2859a894) - @markdumay
+- [Added initial approach for database restore in swarm mode](https://github.com/markdumay/ghost-backend/commit/4278512e2b86f0a7942df217c3b459caf09dd03d) - @markdumay
+- [Clarified purpose of ghost volume mapping](https://github.com/markdumay/ghost-backend/commit/38d4cb3e241d43b7e8c330256b2103e705d04675) - @markdumay
+- [Added header](https://github.com/markdumay/ghost-backend/commit/1e3bb6ad42892acd054626b9cbd2a7de96fb0d0d) - @markdumay
+- [Added restore workflow and --force option](https://github.com/markdumay/ghost-backend/commit/5f5c081cc24932a45d4f2160c73fca9368427044) - @markdumay
+- [Fixed cron and added command-mode](https://github.com/markdumay/ghost-backend/commit/6e6f257f03585c6a64d6d870fd72911e1a4cc149) - @markdumay
+- [Removed closed TODO](https://github.com/markdumay/ghost-backend/commit/c127482cf8c74a70ff5127d97a8dd84888480a2b) - @markdumay
+- [Added logrotation configuration to build](https://github.com/markdumay/ghost-backend/commit/99d7084997b3f97ce707f66accb444d6205b3539) - @markdumay
+- [Made logs and backups persistent](https://github.com/markdumay/ghost-backend/commit/fe3715550eff3b27e8ff0d2b40d5b0bc8bc99073) - @markdumay
+- [Adjusted error message formatting](https://github.com/markdumay/ghost-backend/commit/81d7478bcd0c9d81348921a91f275f4f3770b3c8) - @markdumay
+- [Fixed deleting of old backup directories](https://github.com/markdumay/ghost-backend/commit/98281a8971fc3f180c7bead2089b0d5c963403ca) - @markdumay
+- [Fixed adding of cron jobs](https://github.com/markdumay/ghost-backend/commit/9d07f9d2e2bd8873aa8a3610f9b663bb35ad7026) - @markdumay
+- [Added logrotate configurations](https://github.com/markdumay/ghost-backend/commit/21c0938a41f00c34ae408d2feaab5f34a7be4261) - @markdumay
+- [Fixed prune argument error](https://github.com/markdumay/ghost-backend/commit/538cf74092891c58b4109fc392d6ca01f1363924) - @markdumay
+- [Integrated scripts for mariabackup](https://github.com/markdumay/ghost-backend/commit/e248a9182205589bd4307c86d7bab3e5a60395bf) - @markdumay
+- [Added restic jobs](https://github.com/markdumay/ghost-backend/commit/94849e05b888d3150f5c5b331008077686b78859) - @markdumay
+- [Improved lay-out and readability](https://github.com/markdumay/ghost-backend/commit/11c8343a3e4ca4dd9393afcb660448433357eea9) - @markdumay
+- [Added mariadb backup cron and restic bin](https://github.com/markdumay/ghost-backend/commit/169de97da2653bb4128a86684d5b2a5f717afe30) - @markdumay
+- [Added db_user as docker secret](https://github.com/markdumay/ghost-backend/commit/bc8170a829f9a5666245061398f24ac3aac50562) - @markdumay
+- [Added discovery of latest casper theme](https://github.com/markdumay/ghost-backend/commit/ccb1ab71336ba2b2a70341a9f01761b7dd944dea) - @markdumay
+- [Added hook to read docker secret](https://github.com/markdumay/ghost-backend/commit/9db2ca554e1a06b808280621557fc257d613f36a) - @markdumay
+- [Added downloading of default casper theme](https://github.com/markdumay/ghost-backend/commit/2e6d9de96d4ccd909ec975d5c407b352e09609de) - @markdumay
+- [Changed to example.com](https://github.com/markdumay/ghost-backend/commit/0eadaf4a29b851fc82f8d70dfaca062fb2704399) - @markdumay
+- [Initial commit](https://github.com/markdumay/ghost-backend/commit/044316097235f401cd33390d432c035a608f073c) - @markdumay
+- [Initial commit](https://github.com/markdumay/ghost-backend/commit/dbc2206a7b13ce75073d0ee883e0a77d72c8f092) - @markdumay
