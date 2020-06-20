@@ -84,10 +84,10 @@ Most VPS providers offer several Linux distributions to be installed on your VPS
 It is recommended to test the services locally before deploying them to production. Running the service with `docker-compose` greatly simplifies validating everything is working as expected. Below four steps will allow you to run the services on your local machine and validate it is working correctly.
 
 ### Step 1 - Clone the Repository
-The first step is to clone the repository to a local folder. Assuming you are in the working folder of your choice, clone the repository files. Git automatically creates a new folder `ghost-backend` and copies the files to this directory. Now change your working folder to be prepared for the next steps.
+The first step is to clone the repository to a local folder. Assuming you are in the working folder of your choice, clone the repository files. Git automatically creates a new folder `ghost-backend` and copies the files to this directory. The option `--recurse-submodules` ensures the embedded submodules are fetched too. Now change your working folder to be prepared for the next steps.
 
 ```console
-git clone https://github.com/markdumay/ghost-backend.git
+git clone --recurse-submodules https://github.com/markdumay/ghost-backend.git
 cd ghost-backend
 ```
 
