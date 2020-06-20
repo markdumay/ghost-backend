@@ -199,7 +199,6 @@ The steps for deploying in production are slightly different than for local test
 *Unchanged*
 
 ### Step 2 - Create Docker Secrets
-<!-- TODO: add create_secret script -->
 Instead of file-based secrets, you will now create secure secrets. Docker secrets can be easily created using pipes. Do not forget to include the final `-`, as this instructs Docker to use piped input. Update the credentials as needed.
 
 ```console
@@ -213,7 +212,7 @@ printf XXX | docker secret create STAGE_B2_ACCOUNT_ID -
 printf XXX | docker secret create STAGE_B2_ACCOUNT_KEY -
 ```
 
-If you do not feel comfortable copying secrets from your command line, you can use the wrapper `create_secret.sh`. This script prompts for a secret and ensures sensitive data is not displayed in your console.
+If you do not feel comfortable copying secrets from your command line, you can use the wrapper `create_secret.sh`. This script prompts for a secret and ensures sensitive data is not displayed in your console. The script is available in the folder `/docker-secret` of your repository.
 
 ```console
 ./create_secret.sh db_root_password
