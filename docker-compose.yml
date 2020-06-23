@@ -119,7 +119,11 @@ services:
 
     # TODO: add admin url
     portal:
-        image: steveltn/https-portal:1
+        # TODO: replace with hub image
+        # image: steveltn/https-portal:1
+        build:
+            context: .
+            dockerfile: Dockerfile_portal
         ports:
             - 80:80
             - 443:443
@@ -131,15 +135,16 @@ services:
         volumes:
             # make Portal data persistent
             - ./data/portal:/var/lib/https-portal
-            # add portal configurations
-            - ./config/portal/http.conf.erb:/var/lib/nginx-conf/${DOMAINS_BLOG}.conf.erb:ro
-            - ./config/portal/https.conf.erb:/var/lib/nginx-conf/${DOMAINS_BLOG}.ssl.conf.erb:ro
+            # cross-reference Ghost images and themes for caching
+            - ./data/ghost:/var/lib/ghost/content:ro
         environment:
             - DOMAINS=
               ${DOMAINS_BLOG} -> ${GHOST_HOST},
               www.${DOMAINS_BLOG} => https://${DOMAINS_BLOG},
               ${DOMAINS_ADMIN} => https://${DOMAINS_BLOG}/ghost/
             - STAGE=${STAGE}
+            - CACHING=${CACHING}
+            - DOMAINS_BLOG=${DOMAINS_BLOG}
 
     # TODO: add mail or slack support
 
