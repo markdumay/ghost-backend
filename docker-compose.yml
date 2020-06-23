@@ -125,7 +125,7 @@ services:
             - 443:443
         links:
             - ghost
-        restart: always
+        restart: "no"
         networks:
             frontend:
         volumes:
@@ -135,7 +135,10 @@ services:
             - ./config/portal/http.conf.erb:/var/lib/nginx-conf/${DOMAINS_BLOG}.conf.erb:ro
             - ./config/portal/https.conf.erb:/var/lib/nginx-conf/${DOMAINS_BLOG}.ssl.conf.erb:ro
         environment:
-            - DOMAINS=${DOMAINS_BLOG} -> ${GHOST_HOST}
+            - DOMAINS=
+              ${DOMAINS_BLOG} -> ${GHOST_HOST},
+              www.${DOMAINS_BLOG} => https://${DOMAINS_BLOG},
+              ${DOMAINS_ADMIN} => https://${DOMAINS_BLOG}/ghost/
             - STAGE=${STAGE}
 
     # TODO: add mail or slack support
