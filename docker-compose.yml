@@ -36,7 +36,7 @@ services:
         # image: mariadb:10.3
         build:
             context: .
-            dockerfile: Dockerfile_mariadb
+            dockerfile: ./config/mariadb/docker/Dockerfile
         hostname: mariadb
         command: --max_allowed_packet=256M
         restart: unless-stopped
@@ -78,7 +78,7 @@ services:
         # image: ghost:3-alpine
         build:
             context: .
-            dockerfile: Dockerfile_ghost
+            dockerfile: ./config/ghost/docker/Dockerfile
         restart: unless-stopped
         links:
             - mariadb
@@ -123,7 +123,7 @@ services:
         # image: steveltn/https-portal:1
         build:
             context: .
-            dockerfile: Dockerfile_portal
+            dockerfile: ./config/portal/docker/Dockerfile
         ports:
             - 80:80
             - 443:443
