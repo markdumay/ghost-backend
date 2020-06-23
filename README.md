@@ -350,6 +350,11 @@ Copyright © [Mark Dumay][blog]
 [restic_url]: https://restic.net
 [restic_integration]: https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html
 
+<!-- TODO: add nginx caching -->
+https://gist.github.com/pnommensen/707b5519766ba45366dd
+https://serversforhackers.com/c/nginx-caching
+https://scotthelme.co.uk/caching-ghost-with-nginx/
+
 <!-- MARKDOWN MAINTAINED LINKS -->
 <!-- TODO: add blog link
 [blog]: https://markdumay.com
