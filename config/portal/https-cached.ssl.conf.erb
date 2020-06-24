@@ -64,10 +64,16 @@ server {
 
     location ^~ /assets/ {
         root /var/lib/ghost/content/themes/casper;
+        access_log off;
+        gzip_static on;
+        gzip_comp_level 5;
     }
     
     location ^~ /content/images/ {
         root /var/lib/ghost;
+        access_log off;
+        gzip_static on;
+        gzip_comp_level 5;
     }
 
     location ~ ^/(?:ghost|signout) { 
