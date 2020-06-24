@@ -27,8 +27,6 @@ server {
     add_header X-Content-Type-Options nosniff;
     add_header X-XSS-Protection "1; mode=block";
 
-    # TODO: add ADMIN redirect
-
     location / {
         if ($http_content_type = "text/ping") {
              return 404;

@@ -110,7 +110,6 @@ services:
             - db_user
             - db_password
 
-    # TODO: add admin url
     portal:
         image: "markdumay/portal:latest"
         ports:
