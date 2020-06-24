@@ -118,22 +118,25 @@ The `docker-compose.yml` file uses environment variables to simplify the configu
 mv sample.env .env
 ```
 
+> It's convenient to use a `.test` top-level domain for testing. This domain is reserved for this purpose and is guaranteed not to clash with an existing domain name. However, you will still need to resolve these domains on your local machine. Steven Rombauts wrote an excellent [tutorial][macos_dnsmasq] on how to configure this using `dnsmasq` on macOS.
+
+
 The `.env` file specifies eleven variables. Adjust them as needed:
 
 
-| Variable              | Default             | Description |
-|-----------------------|---------------------|-------------|
-| **DOMAINS_BLOG**      | `example.com`       | Defines the domain name of your blog. Exclude the `http://` and `https://` protocols. |
-| **DOMAINS_ADMIN**     | `admin.example.com` | Defines the admin domain name of your blog. Exclude the `http://` and `https://` protocols. |
-| **DB_NAME**           | `ghost`             | The name of the database to be used by Ghost and MariaDB. |
-| **DB_USER**           | `ghost`             | The name of database user to be used by Ghost when connecting with MariaDB. Ensure it is the same value as the secret `db_user`. |
-| **ADMIN_EMAIL**       | `admin@example.com` | Email address for notifications from Ghost and Let's Encrypt.
-| **THEMES**            | `true`              | Indicates wether the default Ghost theme (Casper) should be installed.
-| **BACKUP**            | `remote`            | Indicates wether to schedule backups automatically. Settings can be either `none` for no backups, `local` for local backups only, or `remote` for both local and remote backups.
-| **RESTIC_REPOSITORY** | `b2:bucketname:/`   | The storage provider and bucket name of the remote repository. For Backblaze B2, the full identifier is `b2:bucketname:path/to/repo`. The identifier for other storage providers can be found [here][restic_integration].
-| **GHOST_HOST**        | `ghost:2368`        | Specifies the local host and port of the Ghost server. The default port is 2368.
-| **STAGE**             | `local`             | Instructs HTTPS Portal to request certificates from Let's Encrypt when set to `production`. When set to `local`, HTTPS Portal installs self-signed certificates for local testing.
-| **CACHING**           | `true`              | Instructs Nginx to cache static files such as images and stylesheets if set to 'true'. The admin portal remains uncached at all times.
+| Variable              | Default              | Description |
+|-----------------------|----------------------|-------------|
+| **DOMAINS_BLOG**      | `example.test`       | Defines the domain name of your blog. Exclude the `http://` and `https://` protocols. |
+| **DOMAINS_ADMIN**     | `admin.example.test` | Defines the admin domain name of your blog. Exclude the `http://` and `https://` protocols. |
+| **DB_NAME**           | `ghost`              | The name of the database to be used by Ghost and MariaDB. |
+| **DB_USER**           | `ghost`              | The name of database user to be used by Ghost when connecting with MariaDB. Ensure it is the same value as the secret `db_user`. |
+| **ADMIN_EMAIL**       | `admin@example.test` | Email address for notifications from Ghost and Let's Encrypt.
+| **THEMES**            | `true`               | Indicates wether the default Ghost theme (Casper) should be installed.
+| **BACKUP**            | `remote`             | Indicates wether to schedule backups automatically. Settings can be either `none` for no backups, `local` for local backups only, or `remote` for both local and remote backups.
+| **RESTIC_REPOSITORY** | `b2:bucketname:/`    | The storage provider and bucket name of the remote repository. For Backblaze B2, the full identifier is `b2:bucketname:path/to/repo`. The identifier for other storage providers can be found [here][restic_integration].
+| **GHOST_HOST**        | `ghost:2368`         | Specifies the local host and port of the Ghost server. The default port is 2368.
+| **STAGE**             | `local`              | Instructs HTTPS Portal to request certificates from Let's Encrypt when set to `production`. When set to `local`, HTTPS Portal installs self-signed certificates for local testing.
+| **CACHING**           | `true`               | Instructs Nginx to cache static files such as images and stylesheets if set to 'true'. The admin portal remains uncached at all times.
 
 
 
@@ -187,10 +190,10 @@ ghost_1 | INFO Relation: [...]
 ```
 
 ### Starting the Ghost Server
-Once the data is available, Ghost will start running in production mode. Typically the initial run takes up to a minute. The boot time is drastically reduced when reconnecting to an existing database. You can now access Ghost at `http://example.com` and setup your (administrative) user(s).
+Once the data is available, Ghost will start running in production mode. Typically the initial run takes up to a minute. The boot time is drastically reduced when reconnecting to an existing database. You can now access Ghost at `http://example.test` and setup your (administrative) user(s).
 ```
 ghost_1    | [2020-06-17 11:45:40] INFO Ghost is running in production...
-ghost_1    | [2020-06-17 11:45:40] INFO Your site is now available on http://example.com
+ghost_1    | [2020-06-17 11:45:40] INFO Your site is now available on http://example.test
 ghost_1    | [2020-06-17 11:45:40] INFO Ctrl+C to shut down
 ghost_1    | [2020-06-17 11:45:40] INFO Ghost boot 24.849s
 ```
@@ -363,12 +366,13 @@ Copyright © [Mark Dumay][blog]
 [docker_url]: https://docker.com
 [ghost_info]: https://ghost.org/docs/concepts/introduction/
 [ghost_url]: https://ghost.org
-[mysqldump]: https://mariadb.com/kb/en/mysqldump/
+[macos_dnsmasq]: https://www.stevenrombauts.be/2018/01/use-dnsmasq-instead-of-etc-hosts/
 [mariadb_url]: https://mariadb.com
+[mysqldump]: https://mariadb.com/kb/en/mysqldump/
 [nginx_cache]: https://scotthelme.co.uk/caching-ghost-with-nginx/
 [portal_url]: https://github.com/SteveLTN/https-portal
-[restic_url]: https://restic.net
 [restic_integration]: https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html
+[restic_url]: https://restic.net
 
 <!-- MARKDOWN MAINTAINED LINKS -->
 <!-- TODO: add blog link
