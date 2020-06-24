@@ -45,7 +45,7 @@
 
 
 ## About
-[Ghost][ghost_info] is a popular open source Content Management System (CMS) based on Node.js. It was founded in 2013 and has seen more than 2 million installations to date. The team behind Ghost offers a managed service that gets you started in minutes. However, in this guide we will be looking into self-hosting Ghost as a back-end service on a Virtual Private Server (VPS). The final configuration aims to be both secure and scaleable.
+[Ghost][ghost_info] is a popular open source Content Management System (CMS) based on Node.js. It was founded in 2013 and has seen more than 2 million installations to date. The team behind Ghost offers a managed service that gets you started in minutes. However, in this guide, we will be looking into self-hosting Ghost as a back-end service on a Virtual Private Server (VPS). The final configuration aims to be both secure and scaleable.
 
 <!-- TODO: add tutorial deep-link 
 Detailed background information is available on the author's [personal blog][blog].
@@ -104,7 +104,7 @@ printf password > secrets/db_backup_password
 printf password > secrets/restic_password
 ```
 
-Next you will need to configure the tokens required to connect with your cloud storage provider. Below example defines the tokens for [Backblaze B2]. *Ghost-backend* automatically stages any Docker secret starting with the prefix `STAGE_`. In below example, `STAGE_B2_ACCOUNT_ID` becomes available as `B2_ACCOUNT_ID` for restic. This [link][restic_integration] provides an overview of the tokens required for each supported cloud provider. Be sure to replace `XXX` with the correct values.
+Next, you will need to configure the tokens required to connect with your cloud storage provider. The below example defines the tokens for [Backblaze B2]. *Ghost-backend* automatically stages any Docker secret starting with the prefix `STAGE_`. In below example, `STAGE_B2_ACCOUNT_ID` becomes available as `B2_ACCOUNT_ID` for restic. This [link][restic_integration] provides an overview of the tokens required for each supported cloud provider. Be sure to replace `XXX` with the correct values.
 
 ```console
 printf XXX > secrets/STAGE_B2_ACCOUNT_ID
@@ -131,10 +131,10 @@ The `.env` file specifies eleven variables. Adjust them as needed:
 | **DB_NAME**           | `ghost`              | The name of the database to be used by Ghost and MariaDB. |
 | **DB_USER**           | `ghost`              | The name of database user to be used by Ghost when connecting with MariaDB. Ensure it is the same value as the secret `db_user`. |
 | **ADMIN_EMAIL**       | `admin@example.test` | Email address for notifications from Ghost and Let's Encrypt.
-| **THEMES**            | `true`               | Indicates wether the default Ghost theme (Casper) should be installed.
-| **BACKUP**            | `remote`             | Indicates wether to schedule backups automatically. Settings can be either `none` for no backups, `local` for local backups only, or `remote` for both local and remote backups.
+| **THEMES**            | `true`               | Indicates whether the default Ghost theme (Casper) should be installed.
+| **BACKUP**            | `remote`             | Indicates whether to schedule backups automatically. Settings can be either `none` for no backups, `local` for local backups only, or `remote` for both local and remote backups.
 | **RESTIC_REPOSITORY** | `b2:bucketname:/`    | The storage provider and bucket name of the remote repository. For Backblaze B2, the full identifier is `b2:bucketname:path/to/repo`. The identifier for other storage providers can be found [here][restic_integration].
-| **GHOST_HOST**        | `ghost:2368`         | Specifies the local host and port of the Ghost server. The default port is 2368.
+| **GHOST_HOST**        | `ghost:2368`         | Specifies the localhost and port of the Ghost server. The default port is 2368.
 | **STAGE**             | `local`              | Instructs HTTPS Portal to request certificates from Let's Encrypt when set to `production`. When set to `local`, HTTPS Portal installs self-signed certificates for local testing.
 | **CACHING**           | `true`               | Instructs Nginx to cache static files such as images and stylesheets if set to 'true'. The admin portal remains uncached at all times.
 
@@ -150,7 +150,7 @@ docker-compose up
 After pulling the images from the Docker Hub, you should see several messages. Below excerpt shows the key messages per section.
 
 #### Enabling Automated Backups
-During boot, *Ghost-backend* enables the local and remote backups in line with the `BACKUP` setting (see <a href="#step-3---update-the-environment-variables">Step 3</a>). First the cron job using `mysqldump` for local backups is scheduled 30 minutes past every hour. Next, the latest `restic` binary is downloaded and installed (`mysqldump` is already present in the parent's Docker image provided by MariaDB). Once restic is installed, it is scheduled to run 45 minutes past every hour. Restic compares the local files with the latest snapshot available in the repository. If needed, it updates the remote repository automatically using `restic_password` as encryption password (see <a href="#step-2---create-the-docker-secrets">Step 2</a>). In the background, old restic snapshots are removed daily at 01:15 am. Restic also updates itself at 04:15 am if a new binary is available. Finally, the cron daemon is fired up.
+During boot, *Ghost-backend* enables the local and remote backups in line with the `BACKUP` setting (see <a href="#step-3---update-the-environment-variables">Step 3</a>). First, the cron job using `mysqldump` for local backups is scheduled 30 minutes past every hour. Next, the latest `restic` binary is downloaded and installed (`mysqldump` is already present in the parent's Docker image provided by MariaDB). Once restic is installed, it is scheduled to run 45 minutes past every hour. Restic compares the local files with the latest snapshot available in the repository. If needed, it updates the remote repository automatically using `restic_password` as encryption password (see <a href="#step-2---create-the-docker-secrets">Step 2</a>). In the background, old restic snapshots are removed daily at 01:15 am. Restic also updates itself at 04:15 am if a new binary is available. Finally, the cron daemon is fired up.
 ```
 mariadb_1 | [Note] Enabling local and remote backup
 mariadb_1 | [Note] Adding backup cron job
@@ -162,7 +162,7 @@ mariadb_1 | [Note] Initialized cron daemon
 ```
 
 ### Initializing the MariaDB Database
-Once the backup jobs are scheduled, the MariaDB database is initialized. MariaDB starts as a temporary server, creates the Ghost database schema and gives the required priviliges to the designated `ghost` database user. A user `ghost_backup` is created for the `mysqldump` cron job scheduled in the previous section as well. The actual MariaDB server is started once the initialization is done.
+Once the backup jobs are scheduled, the MariaDB database is initialized. MariaDB starts as a temporary server, creates the Ghost database schema, and gives the required privileges to the designated `ghost` database user. A user `ghost_backup` is created for the `mysqldump` cron job scheduled in the previous section as well. The actual MariaDB server is started once the initialization is done.
 ```
 mariadb_1 | [Note] [Entrypoint]: Entrypoint script for MySQL Server 1:10.3.22+maria~bionic started.
 mariadb_1 | [Note] [Entrypoint]: Temporary server started.
@@ -181,7 +181,7 @@ mariadb_1 | Version: '10.3.22-MariaDB-1:10.3.22+maria~bionic'  socket: '/var/run
 ```
 
 ### Initializing Ghost Data
-The `docker-compose` configuration instructs Ghost to wait for the database to become available on port `3306`. Once the database is available, Ghost will create and populate all tables, models, and relations at the first run.
+The `docker-compose` configuration instructs Ghost to wait for the database to become available on port `3306`. Once the database is available, Ghost will create and populate all tables, models, and relations in the first run.
 ```
 ghost_1 | docker-compose-wait - Everything's fine, the application can now start!
 ghost_1 | INFO Creating table: [...]
@@ -190,7 +190,7 @@ ghost_1 | INFO Relation: [...]
 ```
 
 ### Starting the Ghost Server
-Once the data is available, Ghost will start running in production mode. Typically the initial run takes up to a minute. The boot time is drastically reduced when reconnecting to an existing database. You can now access Ghost at `http://example.test` and setup your (administrative) user(s).
+Once the data is available, Ghost will start running in production mode. Typically the initial run takes up to a minute. The boot time is drastically reduced when reconnecting to an existing database. You can now access Ghost at `http://example.test` and set up your (administrative) user(s).
 ```
 ghost_1    | [2020-06-17 11:45:40] INFO Ghost is running in production...
 ghost_1    | [2020-06-17 11:45:40] INFO Your site is now available on http://example.test
@@ -199,7 +199,7 @@ ghost_1    | [2020-06-17 11:45:40] INFO Ghost boot 24.849s
 ```
 
 ### Configuring the Reverse Proxy
-The reverse proxy maps the public URLs to the local Ghost service. The main blog is available at `example.test`. By default, the `www.example.test` subdomain is redirected to `example.test` too. The subdomain `admin.example.test` redirects to Ghost's admin portal available at `example.test/ghost/`. If the variable `CACHING` is set to `true`, all Ghost content is cached with the exception of the admin portal. The certificates are self-signed by default, which can be changed to trusted certificates by setting `STAGE` to `production`.
+The reverse proxy maps the public URLs to the local Ghost service. The main blog is available at `example.test`. By default, the `www.example.test` subdomain is redirected to `example.test` too. The subdomain `admin.example.test` redirects to Ghost's admin portal available at `example.test/ghost/`. If the variable `CACHING` is set to `true`, all Ghost content is cached except for the admin portal. The certificates are self-signed by default, which can be changed to trusted certificates by setting `STAGE` to `production`.
 
 ```
 portal_1 | [2020-06-24 04:43:20] INFO Enabling caching
@@ -273,7 +273,7 @@ secrets:
 *Unchanged, however, set DOMAINS_BLOG, DOMAINS_ADMIN, and TARGET to production once everything is working properly*
 
 ### Step 4 - Run the Docker Service
-The Docker services will be deployed to a Docker Stack in production. Unlike Docker Compose, Docker Stack does not automatically create local folders. Create empty folders for the `mariadb`, `ghost` and `portal` data. Next, deploy the Docker Stack using `docker-compose` as input. This ensures the environment variables are parsed correctly.
+The Docker services will be deployed to a Docker Stack in production. Unlike Docker Compose, Docker Stack does not automatically create local folders. Create empty folders for the `mariadb`, `ghost`, and `portal` data. Next, deploy the Docker Stack using `docker-compose` as input. This ensures the environment variables are parsed correctly.
 
 
 ```console
@@ -310,7 +310,7 @@ Open your internet browser and navigate to the Ghost admin page. The default val
 
 ![Ghost setup screen][image_setup]
 
-Once you have set up your administritative account and finished configuring Ghost, you can navigate to the main site at either `example.test` or `example.com`. Ghost is now ready for use.
+Once you have set up your administrative account and finished configuring Ghost, you can navigate to the main site at either `example.test` or `example.com`. Ghost is now ready for use.
 
 ![Ghost home screen][image_home]
 
