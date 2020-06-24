@@ -5,10 +5,10 @@ COPY config/portal/docker/docker-entrypoint-override.sh \
     /usr/local/bin/
 
 # Add configurations
-COPY config/portal/nginx.conf.erb \
-    config/portal/http.conf.erb \
-    config/portal/https-cached.ssl.conf.erb \
-    config/portal/https-uncached.ssl.conf.erb \
+COPY config/portal/nginx/nginx.conf.erb \
+    config/portal/nginx/http.conf.erb \
+    config/portal/nginx/https-cached.ssl.conf.erb \
+    config/portal/nginx/https-uncached.ssl.conf.erb \
     /var/lib/nginx-conf/
 
 # Set ownership and privileges
