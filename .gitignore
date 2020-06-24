@@ -1,6 +1,9 @@
 # dotenv environment variables file
 .env
 
+# gren configuration
+.grenrc.yml
+
 # Mounts for MariaDB, HTTPS portal and Ghost
 /data
 
