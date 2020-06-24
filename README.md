@@ -270,9 +270,9 @@ secrets:
 
 ### Step 3 - Update the Environment Variables
 <!-- Check variables -->
-*Unchanged, however, set DOMAINS_BLOG, DOMAINS_ADMIN, and TARGET to production once everything is working properly*
+*Unchanged, however, update DOMAINS_BLOG, DOMAINS_ADMIN, and set TARGET to production once everything is working properly*
 
-### Step 4 - Run the Docker Service
+### Step 4 - Run the Docker Service (TODO: update)
 The Docker services will be deployed to a Docker Stack in production. Unlike Docker Compose, Docker Stack does not automatically create local folders. Create empty folders for the `mariadb`, `ghost`, and `portal` data. Next, deploy the Docker Stack using `docker-compose` as input. This ensures the environment variables are parsed correctly.
 
 
