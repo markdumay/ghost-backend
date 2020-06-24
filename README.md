@@ -18,11 +18,11 @@
     <a href="https://github.com/markdumay/ghost-backend/pulls" alt="Pulls">
         <img src="https://img.shields.io/github/issues-pr-raw/markdumay/ghost-backend.svg" />
     </a>
-    <a href="https://hub.docker.com/r/markdumay/ghost-backend" alt="Docker Image Size">
-        <img src="https://img.shields.io/docker/image-size/markdumay/ghost-backend.svg" />
+    <a href="https://hub.docker.com/r/markdumay/ghost" alt="Docker Image Size">
+        <img src="https://img.shields.io/docker/image-size/markdumay/ghost.svg" />
     </a>
-    <a href="https://hub.docker.com/repository/docker/markdumay/ghost-backend/builds" alt="Docker Build">
-        <img src="https://img.shields.io/docker/cloud/build/markdumay/ghost-backend.svg" />
+    <a href="https://hub.docker.com/repository/docker/markdumay/ghost/builds" alt="Docker Build">
+        <img src="https://img.shields.io/docker/cloud/build/markdumay/ghost.svg" />
     </a>
     <a href="https://github.com/markdumay/ghost-backend/blob/master/LICENSE" alt="License">
         <img src="https://img.shields.io/github/license/markdumay/ghost-backend.svg" />
