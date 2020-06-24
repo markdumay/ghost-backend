@@ -1,5 +1,32 @@
 # Changelog
 
+## v0.9 (24/06/2020)
+- [Updated title](https://github.com/markdumay/ghost-backend/commit/6c2db4f19fcdc02b697e1e64934bb387b81703dc) - @markdumay
+- [Updated section on Docker stack deployment](https://github.com/markdumay/ghost-backend/commit/64c54b1ef42752379b3c719020849a619f9b0259) - @markdumay
+- [Replaced build files with Docker Hub images](https://github.com/markdumay/ghost-backend/commit/5cabeca72b03b7637cc57dbe6dc31b057cc82fc7) - @markdumay
+- [Updated links to Ghost screenshots](https://github.com/markdumay/ghost-backend/commit/2b6c6f9882709a12d352bb7da25151427e8bec03) - @markdumay
+- [Removed redundant readme](https://github.com/markdumay/ghost-backend/commit/59e51830a304da524b53c3a0f1bcbca3bfb08aad) - @markdumay
+- [Added readme for Ghost image](https://github.com/markdumay/ghost-backend/commit/1d095f15c3c30c0201eed47ec20f8528294d63d7) - @markdumay
+- [Fixed Docker shields](https://github.com/markdumay/ghost-backend/commit/8f86313a2cc5565591bb25c62628c8e4f16131c1) - @markdumay
+- [Added notice to update section](https://github.com/markdumay/ghost-backend/commit/b955e17a4e0d72e2c0450c4e69d14025714b47b9) - @markdumay
+- [Fixed typos](https://github.com/markdumay/ghost-backend/commit/b94c105e19f56c853eb2f24b5a1d9f816567d39b) - @markdumay
+- [Made references to `Ghost-backend` italic](https://github.com/markdumay/ghost-backend/commit/c8f17ada3dbd8aceadfb6709b89e399ed21ffbfa) - @markdumay
+- [Added 'work in progress'](https://github.com/markdumay/ghost-backend/commit/9c96af075f58ae972a9a1e188ac268e7685b8322) - @markdumay
+- [Chnaged default domain to 'example.test'](https://github.com/markdumay/ghost-backend/commit/61f6a109c9aa75f927e246e2572445e2f575718e) - @markdumay
+- [Moved nginx files to separate folder](https://github.com/markdumay/ghost-backend/commit/fb5382d9304724f9abb85290293844c0987145aa) - @markdumay
+- [Added gzip compression](https://github.com/markdumay/ghost-backend/commit/970dcd792075d05788bc7f3c6a202def02083f12) - @markdumay
+- [Added reverse proxy](https://github.com/markdumay/ghost-backend/commit/cf8b1776bb372dbfdd1b5206c3cd095ccc79ffa9) - @markdumay
+- [Standardized location of Docker build files](https://github.com/markdumay/ghost-backend/commit/a2ff969e9140be716298ba8d4bd78c4391045e76) - @markdumay
+- [Added nginx caching links](https://github.com/markdumay/ghost-backend/commit/0fb67650f7171f8f6af72b5f1230d461dcfa2ee9) - @markdumay
+- [Added nginx caching support](https://github.com/markdumay/ghost-backend/commit/31b930cb38a07b66a3f2820e81e95c0637745d14) - @markdumay
+- [Added redirect for www and admin](https://github.com/markdumay/ghost-backend/commit/2520d39019fe34f3d621e20584d05d27716bd460) - @markdumay
+- [Added HTTPS portal for core blog](https://github.com/markdumay/ghost-backend/commit/4f847c649f4f4fcfd1aa1b01cfec738e5146b7e5) - @markdumay
+- [Added reference to docker-secret submodule](https://github.com/markdumay/ghost-backend/commit/9e6353177b09b3391e4dd663d325cca0a9647fa3) - @markdumay
+- [Modified git clone command to include submodules](https://github.com/markdumay/ghost-backend/commit/9e4eb31ede27a277d7d23007a56bfcc8b3b25d85) - @markdumay
+- [Added Github release notes and changelog generator (gren)](https://github.com/markdumay/ghost-backend/commit/ec4decfae0f8f8051f1f8324cf361fb9c0707dd8) - @markdumay
+
+---
+
 ## v0.5 (20/06/2020)
 - [Adjusted title](https://github.com/markdumay/ghost-backend/commit/51642572112faa7ad393c28943c38e71288a741a) - @markdumay
 - [Added section on restoring the Ghost database](https://github.com/markdumay/ghost-backend/commit/263fa73babab34051c4655220e75e8bda28f3de5) - @markdumay
