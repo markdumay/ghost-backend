@@ -61,7 +61,7 @@ The project uses the following core software components:
 * [Restic][restic_url] - Backup program with cloud storage integration
 
 ## Prerequisites
-Ghost-backend can run on a local machine for testing purposes or in a production environment. The setup has been tested locally on macOS and a Virtual Private Server (VPS) running Ubuntu 20.04 LTS. The cloud backup functionality has been tested with [Backblaze B2].
+*Ghost-backend* can run on a local machine for testing purposes or in a production environment. The setup has been tested locally on macOS and a Virtual Private Server (VPS) running Ubuntu 20.04 LTS. The cloud backup functionality has been tested with [Backblaze B2].
 
 ### Recommended Server Sizing
 Ghost is a relatively light-weight application that requires 1 GB of memory. 
@@ -150,7 +150,7 @@ docker-compose up
 After pulling the images from the Docker Hub, you should see several messages. Below excerpt shows the key messages per section.
 
 #### Enabling Automated Backups
-During boot, `ghost-backend` enables the local and remote backups in line with the `BACKUP` setting (see <a href="#step-3---update-the-environment-variables">Step 3</a>). First the cron job using `mysqldump` for local backups is scheduled 30 minutes past every hour. Next, the latest `restic` binary is downloaded and installed (`mysqldump` is already present in the parent's Docker image provided by MariaDB). Once restic is installed, it is scheduled to run 45 minutes past every hour. Restic compares the local files with the latest snapshot available in the repository. If needed, it updates the remote repository automatically using `restic_password` as encryption password (see <a href="#step-2---create-the-docker-secrets">Step 2</a>). In the background, old restic snapshots are removed daily at 01:15 am. Restic also updates itself at 04:15 am if a new binary is available. Finally, the cron daemon is fired up.
+During boot, *Ghost-backend* enables the local and remote backups in line with the `BACKUP` setting (see <a href="#step-3---update-the-environment-variables">Step 3</a>). First the cron job using `mysqldump` for local backups is scheduled 30 minutes past every hour. Next, the latest `restic` binary is downloaded and installed (`mysqldump` is already present in the parent's Docker image provided by MariaDB). Once restic is installed, it is scheduled to run 45 minutes past every hour. Restic compares the local files with the latest snapshot available in the repository. If needed, it updates the remote repository automatically using `restic_password` as encryption password (see <a href="#step-2---create-the-docker-secrets">Step 2</a>). In the background, old restic snapshots are removed daily at 01:15 am. Restic also updates itself at 04:15 am if a new binary is available. Finally, the cron daemon is fired up.
 ```
 mariadb_1 | [Note] Enabling local and remote backup
 mariadb_1 | [Note] Adding backup cron job
@@ -315,7 +315,7 @@ Once you have set up your administritative account and finished configuring Ghos
 ![Ghost home screen][image_home]
 
 ### Restoring the Ghost Database
-If enabled in the environment settings, *ghost-backend* creates local backups of the database every 30 minutes. See the `BACKUP` setting in <a href="#step-3---update-the-environment-variables">Step 3</a> on how to enable this. Under the hood, the script `mysqldump-local.sh` embedded in the `mariadb` container exports the Ghost data to a file in the `/var/backup/mariadb` folder. The same script can also be used to restore the database. To do so, connect to the shell of your running mariadb container by running below command from your host.
+If enabled in the environment settings, *Ghost-backend* creates local backups of the database every 30 minutes. See the `BACKUP` setting in <a href="#step-3---update-the-environment-variables">Step 3</a> on how to enable this. Under the hood, the script `mysqldump-local.sh` embedded in the `mariadb` container exports the Ghost data to a file in the `/var/backup/mariadb` folder. The same script can also be used to restore the database. To do so, connect to the shell of your running mariadb container by running below command from your host.
 ```
 docker exec -it ghost-backend_mariadb_1 bash
 ```
@@ -346,7 +346,7 @@ You can now exit the container with the command `exit`. Finally, restart the `gh
 3. Submit a Pull Request with a comprehensive description of the changes
 
 ## Credits
-Ghost-backend is inspired by the following blog article:
+*Ghost-backend* is inspired by the following blog article:
 * Scott Helme - [Caching Ghost with Nginx][nginx_cache]
 
 ## Donate
