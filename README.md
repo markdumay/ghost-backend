@@ -1,4 +1,4 @@
-# ghost-backend (work in progress)
+# ghost-backend
 
 <!-- Tagline -->
 <p align="center">
