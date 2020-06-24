@@ -269,10 +269,9 @@ secrets:
 ```
 
 ### Step 3 - Update the Environment Variables
-<!-- Check variables -->
 *Unchanged, however, update DOMAINS_BLOG, DOMAINS_ADMIN, and set TARGET to production once everything is working properly*
 
-### Step 4 - Run the Docker Service (TODO: update)
+### Step 4 - Run the Docker Service
 The Docker services will be deployed to a Docker Stack in production. Unlike Docker Compose, Docker Stack does not automatically create local folders. Create empty folders for the `mariadb`, `ghost`, and `portal` data. Next, deploy the Docker Stack using `docker-compose` as input. This ensures the environment variables are parsed correctly.
 
 
@@ -291,17 +290,18 @@ Run the following command to inspect the status of the Docker Stack.
 docker stack services ghost-backend
 ```
 
-<!-- TODO: update this section -->
-You should see the value `1/1` for `REPLICAS` for the `mariadb` and `ghost` services if the stack was initialized correctly. It might take a while before the services are up and running, so simply repeat the command after a few minutes if needed.
+You should see the value `1/1` for `REPLICAS` for the `mariadb`, `ghost`, and `portal` services if the stack was initialized correctly. It might take a while before the services are up and running, so simply repeat the command after a few minutes if needed.
 
 ```
-ID  NAME                MODE        REPLICAS    IMAGE                               PORTS
-*** ghost-backend_acme   replicated  1/1         markdumay/ghost-backend:2.8.6
+ID   NAME                   MODE        REPLICAS  IMAGE                      PORTS
+***  ghost-backend_mariadb  replicated  1/1       markdumay/mariadb:latest   
+***  ghost-backend_ghost    replicated  1/1       markdumay/ghost:latest     *:2368->2368/tcp
+***  ghost-backend_portal   replicated  1/1       markdumay/portal:latest    *:80->80/tcp, *:443->443/tcp
 ```
 
-You can view the service log with `docker service logs ghost-backend_acme` once the service is up and running. Refer to the paragraph <a href="#step-4---run-docker-service">Step 4 - Run with Docker Compose</a> for validation of the logs.
+You can view the service log with `docker service logs <service-name>` once the service is up and running. Refer to <a href="#step-4---run-docker-service">Step 4</a> for validation of the logs.
 
-Debugging swarm services can be quite challenging. If for some reason your service does not initiate properly, you can get its task ID with `docker service ps ghost-backend_acme`. Running `docker inspect <task-id>` might give you some clues to what is happening. Use `docker stack rm ghost-backend` to remove the docker stack entirely.
+Debugging swarm services can be quite challenging. If for some reason your service does not initiate properly, you can get its task ID with `docker service ps <service-name>`. Running `docker inspect <task-id>` might give you some clues to what is happening. Use `docker stack rm ghost-backend` to remove the docker stack entirely.
 
 ## Usage
 
