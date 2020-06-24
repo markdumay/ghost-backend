@@ -1,9 +1,9 @@
 const fs = require("fs");
-
-var knex = require('knex'),
-    config = require('../../config'),
-    common = require('../../lib/common'),
-    knexInstance;
+const knex = require('knex');
+const config = require('../../../shared/config');
+const logging = require('../../../shared/logging');
+const errors = require('@tryghost/errors');
+let knexInstance;
 
 
 /**

@@ -33,10 +33,7 @@ secrets:
 
 services:
     mariadb:
-        # image: mariadb:10.3
-        build:
-            context: .
-            dockerfile: ./config/mariadb/docker/Dockerfile
+        image: "markdumay/mariadb:latest"
         hostname: mariadb
         command: --max_allowed_packet=256M
         restart: unless-stopped
@@ -74,11 +71,7 @@ services:
 
     # https://hub.docker.com/_/ghost/
     ghost:
-        # TODO: replace with hub image
-        # image: ghost:3-alpine
-        build:
-            context: .
-            dockerfile: ./config/ghost/docker/Dockerfile
+        image: "markdumay/ghost:latest"
         restart: unless-stopped
         links:
             - mariadb
@@ -119,17 +112,13 @@ services:
 
     # TODO: add admin url
     portal:
-        # TODO: replace with hub image
-        # image: steveltn/https-portal:1
-        build:
-            context: .
-            dockerfile: ./config/portal/docker/Dockerfile
+        image: "markdumay/portal:latest"
         ports:
             - 80:80
             - 443:443
         links:
             - ghost
-        restart: "no"
+        restart: unless-stopped
         networks:
             frontend:
         volumes:
