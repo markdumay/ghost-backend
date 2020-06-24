@@ -383,5 +383,5 @@ Copyright © [Mark Dumay][blog]
 [ubuntu-docker]: https://github.com/markdumay/ubuntu-docker
 
 <!-- MARKDOWN IMAGES -->
-[image_setup]: images/ghost-setup.png
-[image_home]: images/ghost-home.png
+[image_setup]: https://github.com/markdumay/ghost-backend/raw/master/images/ghost-setup.png
+[image_home]: https://github.com/markdumay/ghost-backend/raw/master/images/ghost-home.png
