@@ -7,28 +7,20 @@ networks:
 secrets:
     db_root_password:
         file: secrets/db_root_password
-        # external: true
     db_user:
         file: secrets/db_user
-        # external: true
     db_password:
         file: secrets/db_password
-        # external: true
     db_backup_user:
         file: secrets/db_backup_user
-        # external: true
     db_backup_password:
         file: secrets/db_backup_password
-        # external: true
     restic_password:
         file: secrets/restic_password
-        # external: true
     STAGE_B2_ACCOUNT_ID:
         file: secrets/STAGE_B2_ACCOUNT_ID
-        # external: true
     STAGE_B2_ACCOUNT_KEY:
         file: secrets/STAGE_B2_ACCOUNT_KEY
-        # external: true
 
 
 services:
