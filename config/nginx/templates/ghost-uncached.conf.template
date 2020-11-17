@@ -1,0 +1,32 @@
+# Define resolver and upstream server variable
+include snippets/ghost-common.conf;
+
+# Configure common certificates
+ssl_certificate /etc/certbot/live/${CERTBOT_DOMAIN}/fullchain.pem;
+ssl_certificate_key /etc/certbot/live/${CERTBOT_DOMAIN}/privkey.pem;
+
+# Redirect HTTP traffic to HTTPS
+server {
+    listen ${NGINX_PORT_HTTP};
+    listen [::]:${NGINX_PORT_HTTP};
+    server_name ghost.${CERTBOT_DOMAIN};
+
+    location / {
+        return 301 https://$server_name$request_uri;
+    }
+}
+
+# Handle HTTPS requests
+server {
+    listen ${NGINX_PORT_HTTPS} ssl http2;
+    listen [::]:${NGINX_PORT_HTTPS} ssl http2;
+    server_name ghost.${CERTBOT_DOMAIN};
+
+    location / {
+        if ($http_content_type = "text/ping") {
+             return 404;
+        }
+
+        include snippets/ghost-proxy.conf;
+    }
+}

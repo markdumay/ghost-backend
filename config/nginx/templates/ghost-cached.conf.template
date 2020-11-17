@@ -1,0 +1,59 @@
+# Define resolver and upstream server variable
+include snippets/ghost-common.conf;
+
+# Configure common certificates
+ssl_certificate /etc/certbot/live/${CERTBOT_DOMAIN}/fullchain.pem;
+ssl_certificate_key /etc/certbot/live/${CERTBOT_DOMAIN}/privkey.pem;
+
+# Define proxy cache
+proxy_cache_path /tmp/ghost-cache levels=1:2 keys_zone=ghost-cache:60m max_size=300m inactive=24h;
+proxy_cache_key "$scheme$request_method$host$request_uri";
+proxy_cache_methods GET HEAD;
+proxy_cache_valid 60m; # cache successful responses for 60 minutes
+proxy_cache_valid 404 1m; # expire 404 responses 1 minute
+
+# Redirect HTTP traffic to HTTPS
+server {
+    listen ${NGINX_PORT_HTTP};
+    listen [::]:${NGINX_PORT_HTTP};
+    server_name ghost.${CERTBOT_DOMAIN};
+
+    location / {
+        return 301 https://$server_name$request_uri;
+    }
+}
+
+# Handle HTTPS requests
+server {
+    listen ${NGINX_PORT_HTTPS} ssl http2;
+    listen [::]:${NGINX_PORT_HTTPS} ssl http2;
+    server_name ghost.${CERTBOT_DOMAIN};
+    add_header X-Cache $upstream_cache_status;
+
+    # Enable caching for main site
+    location / {
+        if ($http_content_type = "text/ping") {
+             return 404;
+        }
+
+        # Define cache settings
+        proxy_cache ghost-cache;
+        proxy_cache_bypass $http_cache_control;
+        proxy_ignore_headers Set-Cookie;
+        proxy_hide_header Set-Cookie;
+        proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+        proxy_ignore_headers Cache-Control;
+        add_header X-Cache-Status $upstream_cache_status;
+
+        # Call upstream server
+        include snippets/ghost-proxy.conf;
+    }
+
+    # Disable caching for admin portal
+    location ~ ^/(?:ghost|signout) { 
+        # Refine header settings
+        add_header Cache-Control "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0";
+
+        include snippets/ghost-proxy.conf;
+    }
+}

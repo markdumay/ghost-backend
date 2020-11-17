@@ -3,6 +3,14 @@ version: "3.7"
 networks:
     backend:
     frontend:
+        external:
+            name: nginx-certbot_portal
+
+volumes:
+    mariadb_data:
+    templates:
+        external:
+            name: nginx-certbot_templates
 
 secrets:
     db_root_password:
@@ -33,7 +41,8 @@ services:
             - backend
         volumes:
             # make mariadb database data, backups, and logs persistent
-            - ./data/mariadb/mysql:/var/lib/mysql
+            - mariadb_data:/var/lib/mysql
+            # - ./data/mariadb/mysql:/var/lib/mysql
             - ./data/mariadb/backup:/var/backup/mariadb
             - ./data/mariadb/log:/var/log
             # cross-reference Ghost images, logs, settings, and themes for remote backup
@@ -61,7 +70,6 @@ services:
             - STAGE_B2_ACCOUNT_KEY
         
 
-    # https://hub.docker.com/_/ghost/
     ghost:
         image: "markdumay/ghost:latest"
         restart: unless-stopped
@@ -77,10 +85,14 @@ services:
             - ./data/ghost:/var/lib/ghost/content
             # add support for Docker secrets
             - ./config/ghost/db/connection.js:/var/lib/ghost/current/core/server/data/db/connection.js:ro
+            # add nginx configuration templates and snippets
+            - templates:/etc/nginx/templates
+            - ./config/nginx/templates/ghost-${CACHING}.conf.template:/var/lib/nginx/templates/${DOMAINS_BLOG}.conf.template:ro
+            - ./config/nginx/snippets:/var/lib/nginx/snippets:ro
         environment:
             # core ghost settings
-            - url=http://${DOMAINS_BLOG}
-            - admin=http://${DOMAINS_ADMIN}
+            - url=https://${DOMAINS_BLOG}
+            # - admin=https://${DOMAINS_ADMIN}
             - database__client=mysql
             - database__connection__host=mariadb
             - database__connection__database=${DB_NAME}
@@ -92,6 +104,7 @@ services:
             - WAIT_HOSTS_TIMEOUT=300            
             # indicate wether the default Ghost theme (Casper) should be installed
             - THEMES=${THEMES}
+            - CACHING=${CACHING}
             # notification settings
             # - mail__transport: SMTP
             # - mail__from: "Server <${ACME_EMAIL}>"
@@ -102,31 +115,7 @@ services:
             - db_user
             - db_password
 
-    portal:
-        image: "markdumay/portal:latest"
-        ports:
-            - 80:80
-            - 443:443
-        links:
-            - ghost
-        restart: unless-stopped
-        networks:
-            frontend:
-        volumes:
-            # make Portal data persistent
-            - ./data/portal:/var/lib/https-portal
-            # cross-reference Ghost images and themes for caching
-            - ./data/ghost:/var/lib/ghost/content:ro
-        environment:
-            - DOMAINS=
-              ${DOMAINS_BLOG} -> ${GHOST_HOST},
-              www.${DOMAINS_BLOG} => https://${DOMAINS_BLOG},
-              ${DOMAINS_ADMIN} => https://${DOMAINS_BLOG}/ghost/
-            - STAGE=${STAGE}
-            - CACHING=${CACHING}
-            - DOMAINS_BLOG=${DOMAINS_BLOG}
-
-    # TODO: add mail or slack support
+    # TODO: add mail support
 
     # https://hub.docker.com/r/bytemark/smtp
     # mail:

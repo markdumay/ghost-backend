@@ -1,4 +1,4 @@
-FROM mariadb:10.3
+FROM mariadb:10.5
 
 # TODO: remove nano when no longer needed
 
@@ -13,13 +13,13 @@ RUN set -ex; \
 	rm -rf /var/lib/apt/lists/*
 
 # Add scripts
-COPY config/mariadb/docker/docker-entrypoint-override.sh \
-    config/mariadb/cron/mysqldump-local.sh \
-    config/mariadb/cron/restic-remote.sh \
+COPY docker/docker-entrypoint-override.sh \
+    cron/mysqldump-local.sh \
+    cron/restic-remote.sh \
     /usr/local/bin/
 
 # Add logrotate configurations
-COPY config/mariadb/logrotate/mysqldumplog config/mariadb/logrotate/resticlog /etc/logrotate.d/
+COPY logrotate/mysqldumplog logrotate/resticlog /etc/logrotate.d/
 
 # Set ownership and privileges
 RUN chmod +x /usr/local/bin/docker-entrypoint-override.sh; \

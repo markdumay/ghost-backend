@@ -55,7 +55,7 @@ Detailed background information is available on the author's [personal blog][blo
 The project uses the following core software components:
 * [Docker][docker_url] - Container platform (including Swarm and Compose)
 * [Ghost][ghost_url] - Content Management System
-* [HTTPS Portal][portal_url] - Fully automated HTTPS server
+* [nginx-certbot][nginx-certbot] - An unprivileged nginx web server with automatically renewed wildcard certificates
 * [MariaDB][mariadb_url] - Community-developed fork of MySQL relational database
 * [Mysqldump][mysqldump] - Open-source tool provided by MariaDB to export a database
 * [Restic][restic_url] - Backup program with cloud storage integration
@@ -117,11 +117,11 @@ The `docker-compose.yml` file uses environment variables to simplify the configu
 ```console
 mv sample.env .env
 ```
-
+<!-- TODO: replace with '/etc/hosts' -->
 > It's convenient to use a `.test` top-level domain for testing. This domain is reserved for this purpose and is guaranteed not to clash with an existing domain name. However, you will still need to resolve these domains on your local machine. Steven Rombauts wrote an excellent [tutorial][macos_dnsmasq] on how to configure this using `dnsmasq` on macOS.
 
 
-The `.env` file specifies eleven variables. Adjust them as needed:
+The `.env` file specifies nine variables. Adjust them as needed:
 
 
 | Variable              | Default              | Description |
@@ -134,9 +134,7 @@ The `.env` file specifies eleven variables. Adjust them as needed:
 | **THEMES**            | `true`               | Indicates whether the default Ghost theme (Casper) should be installed.
 | **BACKUP**            | `remote`             | Indicates whether to schedule backups automatically. Settings can be either `none` for no backups, `local` for local backups only, or `remote` for both local and remote backups.
 | **RESTIC_REPOSITORY** | `b2:bucketname:/`    | The storage provider and bucket name of the remote repository. For Backblaze B2, the full identifier is `b2:bucketname:path/to/repo`. The identifier for other storage providers can be found [here][restic_integration].
-| **GHOST_HOST**        | `ghost:2368`         | Specifies the localhost and port of the Ghost server. The default port is 2368.
-| **STAGE**             | `local`              | Instructs HTTPS Portal to request certificates from Let's Encrypt when set to `production`. When set to `local`, HTTPS Portal installs self-signed certificates for local testing.
-| **CACHING**           | `true`               | Instructs Nginx to cache static files such as images and stylesheets if set to 'true'. The admin portal remains uncached at all times.
+| **CACHING**           | `uncached`               | Instructs Nginx to cache responses and static files such as images and stylesheets if set to 'cached'. The admin portal remains uncached at all times.
 
 
 
@@ -161,6 +159,7 @@ mariadb_1 | [Note] View the cron log in '/var/log/restic.log'
 mariadb_1 | [Note] Initialized cron daemon
 ```
 
+<!--TODO: update MariaDB version -->
 ### Initializing the MariaDB Database
 Once the backup jobs are scheduled, the MariaDB database is initialized. MariaDB starts as a temporary server, creates the Ghost database schema, and gives the required privileges to the designated `ghost` database user. A user `ghost_backup` is created for the `mysqldump` cron job scheduled in the previous section as well. The actual MariaDB server is started once the initialization is done.
 ```
@@ -173,6 +172,7 @@ mariadb_1 | [Note] Creating mariadb backup user 'ghost_backup' for database
 mariadb_1 | [Note] [Entrypoint]: MySQL init process done. Ready for start up.
 ```
 
+<!--TODO: update MariaDB version -->
 ### Starting the MariaDB Database
 With the database properly initialized, MariaDB can start accepting connections. The default port is `3306`.
 ```
@@ -198,6 +198,7 @@ ghost_1    | [2020-06-17 11:45:40] INFO Ctrl+C to shut down
 ghost_1    | [2020-06-17 11:45:40] INFO Ghost boot 24.849s
 ```
 
+<!-- TODO: update section -->
 ### Configuring the Reverse Proxy
 The reverse proxy maps the public URLs to the local Ghost service. The main blog is available at `example.test`. By default, the `www.example.test` subdomain is redirected to `example.test` too. The subdomain `admin.example.test` redirects to Ghost's admin portal available at `example.test/ghost/`. If the variable `CACHING` is set to `true`, all Ghost content is cached except for the admin portal. The certificates are self-signed by default, which can be changed to trusted certificates by setting `STAGE` to `production`.
 
@@ -370,7 +371,6 @@ Copyright © [Mark Dumay][blog]
 [mariadb_url]: https://mariadb.com
 [mysqldump]: https://mariadb.com/kb/en/mysqldump/
 [nginx_cache]: https://scotthelme.co.uk/caching-ghost-with-nginx/
-[portal_url]: https://github.com/SteveLTN/https-portal
 [restic_integration]: https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html
 [restic_url]: https://restic.net
 
@@ -381,6 +381,7 @@ Copyright © [Mark Dumay][blog]
 [blog]: https://github.com/markdumay
 [repository]: https://github.com/markdumay/ghost-backend.git
 [ubuntu-docker]: https://github.com/markdumay/ubuntu-docker
+[nginx-certbot]: https://github.com/markdumay/nginx-certbot
 
 <!-- MARKDOWN IMAGES -->
 [image_setup]: https://github.com/markdumay/ghost-backend/raw/master/images/ghost-setup.png
