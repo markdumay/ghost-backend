@@ -132,12 +132,11 @@ validate_backup_filename() {
     fi
 
     # split into directory and filename if applicable
-    # TODO: test
-    BASEPATH=$(dirname "$BACKUP_FILENAME")
-    if [ -z "$BASEPATH" ] || [ "$BASEPATH" != "." ]; then
-        ABS_PATH_AND_FILE=$(readlink -f "$DOCKER_BACKUP_FILENAME")
-        BACKUP_DIR=$(dirname "$ABS_PATH_AND_FILE")
-        BACKUP_FILENAME=$(basename "$ABS_PATH_AND_FILE")
+    filename=$(basename "${backup_filename}")
+    if [ "${filename}" != "${backup_filename}" ] ; then
+        abs_path_and_file=$(readlink -f "${backup_filename}")
+        backup_dir=$(dirname "${abs_path_and_file}")
+        backup_filename=$(basename "${abs_path_and_file}")
     fi
 }
 
