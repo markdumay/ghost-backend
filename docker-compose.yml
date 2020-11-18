@@ -55,6 +55,8 @@ services:
             - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
             - MYSQL_USER_FILE=/run/secrets/db_user
             - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+            - MYSQL_BACKUP_USER_FILE=/run/secrets/db_backup_user
+            - MYSQL_BACKUP_PASSWORD_FILE=/run/secrets/db_backup_password
             # backup settings
             - BACKUP=${BACKUP}
             - RESTIC_REPOSITORY=${RESTIC_REPOSITORY}
