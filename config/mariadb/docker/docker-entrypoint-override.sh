@@ -4,8 +4,8 @@
 # Title         : docker-entrypoint-override.sh
 # Description   : Automates local and cloud backups of mariadb
 # Author        : Mark Dumay
-# Date          : June 16th, 2020
-# Version       : 1.0.0
+# Date          : November 17th, 2020
+# Version       : 1.1.0
 # Usage         : ENTRYPOINT ["docker-entrypoint-override.sh", "docker-entrypoint.sh"]
 # Repository    : https://github.com/markdumay/ghost-backend.git
 #======================================================================================================================
@@ -13,24 +13,35 @@
 #======================================================================================================================
 # Constants
 #======================================================================================================================
+readonly BIN='/usr/local/bin'
+readonly BACKUP_DIR='/var/mariadb/backup'
+readonly BACKUP_LOG='/var/log/mysqldump.log'
+readonly RESTIC_LOG='/var/log/restic.log'
 
-readonly BIN=/usr/local/bin
-readonly BACKUP_DIR=/var/mariadb/backup
-readonly BACKUP_LOG=/var/log/mysqldump.log
-readonly RESTIC_LOG=/var/log/restic.log
-readonly REPOSITORY="restic/restic"
-readonly DOWNLOAD_GITHUB="https://github.com/$REPOSITORY/releases/download"
-readonly GITHUB_API="https://api.github.com/repos/$REPOSITORY/releases/latest"
-readonly INSTALL_DIR="/usr/bin/restic"
-readonly DEFAULT_RESTIC_VERSION='0.9.6'
-readonly TEMP_DIR=/tmp/restic
+
+#======================================================================================================================
+# Variables
+#======================================================================================================================
+backup_interval=5 # TODO: change to 30 minutes; make ENV setting
+
+# mysqldump-local.sh: echo "0,30 * * * *"
+# restic-remote.sh backup: echo "45 * * * *"
+# restic-remote.sh prune: "15 1 * * *"
+# restic-remote.sh update: "15 4 * * *"
 
 
 #======================================================================================================================
 # Helper Functions
 #======================================================================================================================
 
-# Prints current progress to the console
+#======================================================================================================================
+# Print current progress with timestamp to the console.
+#======================================================================================================================
+# Arguments:
+#   $1 - Progress message to display.
+# Outputs:
+#   Writes message to stdout.
+#======================================================================================================================
 print_status () {
     echo "$(date -u '+%Y-%m-%d %T') 0 $1"
 }
@@ -48,7 +59,7 @@ validate_backup_settings() {
         none )
             LOCAL_BACKUP='false'
             REMOTE_BACKUP='false'
-            print_status "[Info] Disabling backups"
+            print_status "[Note] Disabling backups"
             ;;
         local )
             LOCAL_BACKUP='true'
@@ -88,6 +99,7 @@ execute_install_backup_cron() {
     fi
 }
 
+
 # Install restic cron jobs if REMOTE_BACKUP is flagged
 execute_install_restic_cron() {
     if [ "${REMOTE_BACKUP}" = 'true' ] ; then
@@ -115,62 +127,36 @@ execute_install_restic_cron() {
     fi
 }
 
-# Download and install latest restic binary
-execute_download_install_restic() {
-    # Detect latest available stable restic version
-    VERSION=$(curl -s "${GITHUB_API}" | grep "tag_name" | grep -Eo "[0-9]+.[0-9]+.[0-9]+")
-    if [ -z "${VERSION}" ] ; then
-        print_status "[Warning] Could not detect Restic versions available for download, setting default value"
-        VERSION="${DEFAULT_RESTIC_VERSION}"
-    fi
-
-    # prepare temp download directory
-    mkdir -p "${TEMP_DIR}"
-    rm -rf "${TEMP_DIR}"/*
-
-    # Download and install targeted restic binary
-    OS=$(uname -s | tr -s '[:upper:]' '[:lower:]')
-    ARCH=$(uname -m | sed "s/x86_64/amd64/g")
-    RESTIC_URL="${DOWNLOAD_GITHUB}/v${VERSION}/restic_${VERSION}_${OS}_${ARCH}.bz2"
-    RESPONSE=$(curl -L -s "${RESTIC_URL}" --write-out '%{http_code}' -o "${TEMP_DIR}/restic.bz2")
-
-    if [ "$RESPONSE" != 200 ] ; then
-        print_status "[Error] Restic binary could not be downloaded"
-    else
-        bunzip2 "${TEMP_DIR}/restic.bz2"
-        chown root:root "${TEMP_DIR}"/restic && chmod +x "${TEMP_DIR}"/restic
-        cp "${TEMP_DIR}"/restic "${INSTALL_DIR}"
-        print_status "[Note] Installed $(restic version)"
-    fi
-
-    # remove temp download directory
-    rm -rf "${TEMP_DIR}"
-}
-
-# Initialize cron daemon if either local backup or remote backup is flagged
-execute_start_cron() {
-    if [ "${LOCAL_BACKUP}" = 'true' ] || [ "${REMOTE_BACKUP}" = 'true' ] ; then
-        update-rc.d cron defaults
-        /etc/init.d/cron start
-        CRON_RUNNING=$(service cron status | grep 'cron is running')
-        if [ -n "${CRON_RUNNING}" ] ; then
-            print_status "[Note] Initialized cron daemon"
-        else
-            print_status "[Error] Cron daemon not running / initialized"
-        fi
-    fi
+execute_scheduled_backup() {
+    while true
+    do 
+        sleep "${backup_interval}"
+        print_status "[Note] Invoking local backup"
+        # Execute backup command and redirect its output to the current terminal / log
+        mysqldump-local.sh backup "${BACKUP_DIR}" > /proc/$$/fd/1 || print_status "[Warning] Local backup failed"
+    done
 }
 
 #======================================================================================================================
 # Main Script
 #======================================================================================================================
 
-# Execute workflows
-validate_backup_settings
-execute_install_backup_cron
-execute_download_install_restic
-execute_install_restic_cron
-execute_start_cron
+#======================================================================================================================
+# Entrypoint for the script.
+#======================================================================================================================
+main() {
+    # Execute workflows
+    validate_backup_settings
+    execute_install_backup_cron
+    execute_install_restic_cron
 
-# Run container as daemon
-exec "$@"
+    # Run container as daemon
+    # TODO: fix parameter validation
+    if [ "${BACKUP}" == 'local' ] || [ "${BACKUP}" == 'remote' ]; then
+        exec "$@" & execute_scheduled_backup
+    else
+        exec "$@"
+    fi
+}
+
+main "$@"
