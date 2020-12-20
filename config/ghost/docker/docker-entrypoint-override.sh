@@ -161,7 +161,7 @@ main() {
     # Wait for dependencies and then run Ghost in background; store PID for future use
     wait && exec /usr/local/bin/docker-entrypoint.sh "$@" & pid="$!"
 
-    # Listen for any signals indefinetely
+    # Listen for any signals indefinitely
     while true
     do
         tail -f /dev/null & wait ${!}
