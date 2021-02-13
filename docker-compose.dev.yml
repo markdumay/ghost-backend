@@ -1,37 +1,59 @@
 secrets:
-    db_root_password:
-        file: secrets/db_root_password
-        external: false
-    db_user:
-        file: secrets/db_user
-        external: false
-    db_password:
-        file: secrets/db_password
-        external: false
-    db_backup_user:
-        file: secrets/db_backup_user
-        external: false
-    db_backup_password:
-        file: secrets/db_backup_password
-        external: false
-    restic_password:
-        file: secrets/restic_password
-        external: false
-    STAGE_B2_ACCOUNT_ID:
-        file: secrets/STAGE_B2_ACCOUNT_ID
-        external: false
-    STAGE_B2_ACCOUNT_KEY:
-        file: secrets/STAGE_B2_ACCOUNT_KEY
-        external: false
+  db_root_password:
+    file: secrets/db_root_password
+    external: false
+  db_user:
+    file: secrets/db_user
+    external: false
+  db_password:
+    file: secrets/db_password
+    external: false
+  db_backup_user:
+    file: secrets/db_backup_user
+    external: false
+  db_backup_password:
+    file: secrets/db_backup_password
+    external: false
+  restic_password:
+    file: secrets/restic_password
+    external: false
+  STAGE_B2_ACCOUNT_ID:
+    file: secrets/STAGE_B2_ACCOUNT_ID
+    external: false
+  STAGE_B2_ACCOUNT_KEY:
+    file: secrets/STAGE_B2_ACCOUNT_KEY
+    external: false
 
 
 services:
-    mariadb:
-        build:
-            dockerfile: docker/Dockerfile
-            context: ./config/mariadb
-       
-    ghost:
-        build:
-            dockerfile: Dockerfile
-            context: ./config/ghost/docker
+  mariadb:
+    build:
+      dockerfile: ./config/mariadb/docker/Dockerfile
+      context: .
+      args:
+        BUILD_VERSION: "${BUILD_VERSION}"
+        BUILD_UID: "${BUILD_UID}"
+        BUILD_GID: "${BUILD_GID}"
+        # BUILD_FLAGS: --add-shell --read-only
+        BUILD_TARGET: test
+        MARIADB_VERSION: "${MARIADB_VERSION}"
+
+  ghost:
+    build:
+      dockerfile: ./config/ghost/docker/Dockerfile
+      context: .
+      args:
+        BUILD_VERSION: "${BUILD_VERSION}"
+        BUILD_UID: "${BUILD_UID}"
+        BUILD_GID: "${BUILD_GID}"
+        BUILD_FLAGS: --add-shell
+        BUILD_TARGET: test
+        GHOST_VERSION: "${GHOST_VERSION}"
+        GHOST_CLI_VERSION: "${GHOST_CLI_VERSION}"
+        WAIT_VERSION: "${WAIT_VERSION}"
+        NODE_MAJOR_VERSION: "${NODE_MAJOR_VERSION}"
+        ALPINE_VERSION: "${ALPINE_VERSION}"
+
+    # volumes:
+    #   - type: tmpfs
+    #     target: /tmp

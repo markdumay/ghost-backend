@@ -1,0 +1,55 @@
+# Copyright © 2021 Mark Dumay. All rights reserved.
+# Use of this source code is governed by The MIT License (MIT) that can be found in the LICENSE file.
+
+services:
+  mariadb:
+    build:
+      dockerfile: ./config/mariadb/docker/Dockerfile
+      context: .
+      args:
+        BUILD_VERSION: "${BUILD_VERSION}"
+        BUILD_UID: "${BUILD_UID}"
+        BUILD_GID: "${BUILD_GID}"
+        # BUILD_FLAGS: --add-shell --read-only
+        BUILD_TARGET: production
+        MARIADB_VERSION: "${MARIADB_VERSION}"
+
+  ghost:
+    build:
+      dockerfile: ./config/ghost/docker/Dockerfile
+      context: .
+      args:
+        BUILD_VERSION: "${BUILD_VERSION}"
+        BUILD_UID: "${BUILD_UID}"
+        BUILD_GID: "${BUILD_GID}"
+        BUILD_FLAGS: --add-shell --read-only
+        BUILD_TARGET: production
+        GHOST_VERSION: "${GHOST_VERSION}"
+        GHOST_CLI_VERSION: "${GHOST_CLI_VERSION}"
+        WAIT_VERSION: "${WAIT_VERSION}"
+        NODE_MAJOR_VERSION: "${NODE_MAJOR_VERSION}"
+        ALPINE_VERSION: "${ALPINE_VERSION}"
+
+
+
+    # read_only: true
+    # volumes:
+    #   - type: tmpfs
+    #     target: /tmp
+    #   - type: tmpfs
+    #     target: /var/lib/nginx/conf.d
+    #   - type: tmpfs
+    #     target: /var/cache/nginx
+    # deploy:
+    #   restart_policy:
+    #     condition: on-failure
+    #     delay: 30s
+    #     max_attempts: 5
+    #     window: 120s
+    #   resources:
+    #     limits:
+    #       cpus: "${NGINX_LIMIT_CPU}"
+    #       memory: "${NGINX_LIMIT_MEM}"
+    #     reservations:
+    #       cpus: "${NGINX_RESERVATION_CPU}"
+    #       memory: "${NGINX_RESERVATION_MEM}"
