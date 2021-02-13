@@ -12,3 +12,6 @@
 
 # Local filesystem files
 .DS_Store
+
+# Visual Studo code configuration
+.vscode
