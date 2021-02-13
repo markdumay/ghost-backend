@@ -1,6 +1,13 @@
-FROM mariadb:10.5
+ARG BUILD_UID=1001
+ARG BUILD_GID=1001
+ARG BUILD_USER='mysql'
+ARG BUILD_FLAGS=''
+ARG BUILD_VERSION
+ARG BUILD_TARGET='test'
+ARG MARIADB_VERSION
+FROM mariadb:"${MARIADB_VERSION}"
 
-# TODO: remove nano when no longer needed
+# TODO: remove nano and restic when no longer needed
 
 # Add logrotate and self-updated restic
 RUN set -ex && \
@@ -10,10 +17,10 @@ RUN set -ex && \
 	rm -rf /var/lib/apt/lists/*;
 
 # Add scripts
-COPY docker/docker-entrypoint-override.sh cron/mysqldump-local.sh cron/restic-remote.sh /usr/local/bin/
+COPY ./config/mariadb/docker/docker-entrypoint-override.sh ./config/mariadb/cron/mysqldump-local.sh ./config/mariadb/cron/restic-remote.sh /usr/local/bin/
 
 # Add logrotate configurations
-COPY logrotate/mysqldumplog logrotate/resticlog /etc/logrotate.d/
+COPY ./config/mariadb/logrotate/mysqldumplog ./config/mariadb/logrotate/resticlog /etc/logrotate.d/
 
 # Set ownership and privileges
 RUN chmod +x /usr/local/bin/docker-entrypoint-override.sh && \
