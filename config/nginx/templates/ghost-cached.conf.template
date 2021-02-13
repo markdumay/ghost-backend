@@ -1,5 +1,5 @@
 # Define resolver and upstream server variable
-include snippets/ghost-common.conf;
+include templates/snippets/ghost-common.conf;
 
 # Configure common certificates
 ssl_certificate /etc/certbot/live/${CERTBOT_DOMAIN}/fullchain.pem;
@@ -46,7 +46,7 @@ server {
         add_header X-Cache-Status $upstream_cache_status;
 
         # Call upstream server
-        include snippets/ghost-proxy.conf;
+        include templates/snippets/ghost-proxy.conf;
     }
 
     # Disable caching for admin portal
@@ -54,6 +54,6 @@ server {
         # Refine header settings
         add_header Cache-Control "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0";
 
-        include snippets/ghost-proxy.conf;
+        include templates/snippets/ghost-proxy.conf;
     }
 }

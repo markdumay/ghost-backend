@@ -1,5 +1,5 @@
 # Define resolver and upstream server variable
-include snippets/ghost-common.conf;
+include templates/snippets/ghost-common.conf;
 
 # Configure common certificates
 ssl_certificate /etc/certbot/live/${CERTBOT_DOMAIN}/fullchain.pem;
@@ -27,6 +27,6 @@ server {
              return 404;
         }
 
-        include snippets/ghost-proxy.conf;
+        include templates/snippets/ghost-proxy.conf;
     }
 }
