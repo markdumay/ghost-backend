@@ -13,12 +13,9 @@
 #======================================================================================================================
 # Constants
 #======================================================================================================================
-readonly GHOST_CONTENT="/var/lib/ghost/content"
-readonly REPOSITORY="TryGhost/Casper"
-readonly DOWNLOAD_GITHUB="https://github.com/$REPOSITORY/archive"
-readonly GITHUB_API="https://api.github.com/repos/$REPOSITORY/releases/latest"
-readonly INSTALL_DIR="$GHOST_CONTENT/themes/casper/"
-readonly DEFAULT_CASPER_VERSION="3.1.2"
+readonly CONTENT_FOLDERS='/apps /data /images /logs /settings /themes'
+readonly INSTALL_DIR='/var/lib/ghost'
+readonly CONTENT_BASE_DIR='/var/lib/ghost/content'
 
 
 #======================================================================================================================
@@ -150,11 +147,10 @@ main() {
     # Download default theme if applicable
     execute_download_install_casper
 
-    # Copy nginx templates and snippets
-    print_status "INFO Deploying nginx configuration templates"
-    mkdir -p /etc/nginx/templates/snippets
-    cp /var/lib/nginx/templates/*.template /etc/nginx/templates/
-    cp /var/lib/nginx/snippets/*.conf /etc/nginx/templates/snippets/
+    # Initialize content volume, including default theme (Casper)
+    folders=$(echo "${CONTENT_FOLDERS}" | sed "s|/|${CONTENT_BASE_DIR}/|g")
+    eval "mkdir -p ${folders}"
+    ln -s "${INSTALL_DIR}"/current/content/themes/casper "${CONTENT_BASE_DIR}"/themes/casper
 
     # Trigger cleanup when receiving stop signal
     trap cleanup EXIT

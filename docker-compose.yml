@@ -82,11 +82,7 @@ services:
       - backend
       - frontend
     volumes:
-      # make Ghost images, logs, settings, and themes persistent
-      - ./data/ghost:/var/lib/ghost/content
-      # add support for Docker secrets
-      - ./config/ghost/db/connection.js:/var/lib/ghost/current/core/server/data/db/connection.js:ro
-      # add nginx configuration templates and snippets
+      - ghost_data:/var/lib/ghost/content
       - templates:/etc/nginx/templates
       - ./config/nginx/templates/ghost-${CACHING}.conf.template:/var/lib/nginx/templates/${DOMAINS_BLOG}.conf.template:ro
       - ./config/nginx/snippets:/var/lib/nginx/snippets:ro
