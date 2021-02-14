@@ -115,7 +115,7 @@ RUN set -eu; \
         -u "${BUILD_UID}" \
         -g "${BUILD_GID}" \
         -d /tmp \
-        # -v /var/lib/ghost/content \
+        -v "${GHOST_CONTENT}" \
         -v /etc/nginx/templates \
         -d "${GHOST_INSTALL}" \
         -f /usr/local/sbin/docker_entrypoint.sh \
