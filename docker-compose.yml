@@ -8,6 +8,7 @@ networks:
 
 volumes:
   mariadb_data:
+  ghost_data:
   templates:
     external:
       name: proxy_templates
