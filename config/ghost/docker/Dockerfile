@@ -25,27 +25,34 @@ FROM node:"${NODE_MAJOR_VERSION?version}"-alpine"${ALPINE_VERSION?version}" as b
 #Grab su-exec for easy step-down from root
 RUN apk add --no-cache 'su-exec>=0.2'
 
-ARG GHOST_VERSION
-ARG GHOST_CLI_VERSION
-ENV NODE_ENV production
-ENV GHOST_INSTALL /var/lib/ghost
-ENV GHOST_CONTENT /var/lib/ghost/content
 
 # Install Ghost CLI
+ARG GHOST_CLI_VERSION
 RUN set -eu; \
 	npm install -g "ghost-cli@${GHOST_CLI_VERSION}"; \
 	npm cache clean --force
 
 # Install and configure Ghost using CLI
+ARG GHOST_PORT
+ARG GHOST_VERSION
+ENV NODE_ENV production
+ENV GHOST_INSTALL /var/lib/ghost
+ENV GHOST_CONTENT /var/lib/ghost/content
 RUN set -eu; \
 	mkdir -p "${GHOST_INSTALL}"; \
 	chown node:node "${GHOST_INSTALL}"; \
 	\
 	su-exec node ghost install "${GHOST_VERSION}" --db sqlite3 --no-prompt --no-stack --no-setup --dir "${GHOST_INSTALL}"; \
 	\
-    # Tell Ghost to listen on all ips and not prompt for additional configuration
+    # Tell Ghost to listen on all ips and not to prompt for additional configuration
 	cd "${GHOST_INSTALL}"; \
-	su-exec node ghost config --ip 0.0.0.0 --port 2368 --no-prompt --db sqlite3 --url http://localhost:2368 --dbpath "${GHOST_CONTENT}/data/ghost.db"; \
+	su-exec node ghost config \
+		--ip 0.0.0.0 \
+		--port "${GHOST_PORT}" \
+		--no-prompt \
+		--db sqlite3 \
+		--url http://localhost:"${GHOST_PORT}" \
+		--dbpath "${GHOST_CONTENT}/data/ghost.db"; \
 	su-exec node ghost config paths.contentPath "${GHOST_CONTENT}"; \
 	\
     # Make a config.json symlink for NODE_ENV=development (and sanity check that it's correct)
