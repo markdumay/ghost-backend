@@ -13,6 +13,10 @@
 #======================================================================================================================
 # Constants
 #======================================================================================================================
+readonly RED='\e[31m' # Red color
+readonly NC='\e[m'    # No color / reset
+readonly BOLD='\e[1m' # Bold font
+readonly NODE_CMD="node 'current/index.js'"
 readonly CONTENT_FOLDERS='/apps /data /images /logs /settings /themes'
 readonly INSTALL_DIR='/var/lib/ghost'
 readonly CONTENT_BASE_DIR='/var/lib/ghost/content'
@@ -27,6 +31,20 @@ pid=0
 #======================================================================================================================
 # Helper Functions
 #======================================================================================================================
+
+#=======================================================================================================================
+# Displays error message on console and terminates with non-zero error.
+#=======================================================================================================================
+# Arguments:
+#   $1 - Error message to display.
+# Outputs:
+#   Writes error message to stderr, non-zero exit code.
+#=======================================================================================================================
+terminate() {
+    printf "[$(date -u '+%Y-%m-%d %T')] ${RED}${BOLD}%s${NC}\n" "ERROR: $1"
+    exit 1
+}
+
 
 #======================================================================================================================
 # Print current progress to the console with a timestamp as prefix.
