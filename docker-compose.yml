@@ -85,8 +85,6 @@ services:
     volumes:
       - ghost_data:/var/lib/ghost/content
       - templates:/etc/nginx/templates
-      - ./config/nginx/templates/ghost-${CACHING}.conf.template:/var/lib/nginx/templates/${DOMAINS_BLOG}.conf.template:ro
-      - ./config/nginx/snippets:/var/lib/nginx/snippets:ro
     environment:
       # core ghost settings
       - url=http://${DOMAINS_BLOG}
@@ -102,9 +100,9 @@ services:
       - WAIT_HOSTS=mariadb:3306
       - WAIT_SLEEP_INTERVAL=5
       - WAIT_HOSTS_TIMEOUT=300            
-      # indicate wether the default Ghost theme (Casper) should be installed
-      - THEMES=${THEMES}
+      # proxy settings
       - CACHING=${CACHING}
+      - DOMAINS_BLOG=${DOMAINS_BLOG}
       # notification settings
       # - mail__transport: SMTP
       # - mail__from: "Server <${ACME_EMAIL}>"

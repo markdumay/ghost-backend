@@ -94,6 +94,8 @@ FROM node:"${NODE_MAJOR_VERSION?version}"-alpine"${ALPINE_VERSION?version}"
 
 ENV GHOST_INSTALL /var/lib/ghost
 ENV GHOST_CONTENT /var/lib/ghost/content
+ENV TEMPLATE_SOURCE_DIR /var/lib/nginx/templates
+ENV SNIPPETS_SOURCE_DIR /var/lib/nginx/snippets
 ENV NODE_ENV production
 
 # Copy helper scripts and binaries
@@ -106,13 +108,14 @@ ADD https://github.com/ufoscout/docker-compose-wait/releases/download/"${WAIT_VE
 COPY --from=builder "${GHOST_INSTALL}" "${GHOST_INSTALL}"
 
 # Harden the image and assign access rights for key files and folders
+# Note: ln is needed by entrypoint script
 ARG BUILD_FLAGS
 ARG BUILD_UID
 ARG BUILD_GID
 ARG BUILD_USER
 RUN set -eu; \
     apk update -f; \
-    apk --no-cache add -f shadow; \
+    apk --no-cache add -f grep shadow; \
     rm -rf /var/cache/apk/* /tmp; \
     chmod +x /usr/local/sbin/docker_entrypoint.sh; \
     chmod +x /usr/local/sbin/harden_alpine.sh; \
@@ -127,7 +130,14 @@ RUN set -eu; \
         -d "${GHOST_INSTALL}" \
         -f /usr/local/sbin/docker_entrypoint.sh \
         -U node \
+		-k ln \
         "${BUILD_FLAGS}";
+
+#TODO: copy configuration files
+COPY config/ghost/node/healthcheck.js "${GHOST_INSTALL}"/current/
+COPY config/ghost/db/connection.js "${GHOST_INSTALL}"/current/core/server/data/db/connection.js
+COPY config/nginx/templates/*.template "${TEMPLATE_SOURCE_DIR}"/
+COPY config/nginx/snippets/*.conf "${SNIPPETS_SOURCE_DIR}"/
 
 # Run the container as non-root user
 ARG BUILD_USER
@@ -144,9 +154,8 @@ HEALTHCHECK --interval=1m30s --timeout=10s --retries=3 --start-period=1m \
     CMD if [ "${BUILD_TARGET}" = 'production' ]; then node "${GHOST_INSTALL}"/current/healthcheck.js; else exit 0; fi
 
 # Run entrypoint script
-# ENTRYPOINT [ "docker_entrypoint.sh" ]
+ENTRYPOINT [ "docker_entrypoint.sh" ]
 
 # Define default command and port
 ARG GHOST_PORT
 EXPOSE "${GHOST_PORT}"
-CMD ["node", "current/index.js"]
