@@ -131,10 +131,10 @@ USER "${BUILD_USER}"
 WORKDIR "${GHOST_INSTALL}"
 VOLUME [ "${GHOST_CONTENT}" ]
 
-# # Define the healthcheck (production only)
-# # ARG BUILD_TARGET
-# # HEALTHCHECK --interval=1m30s --timeout=10s --retries=3 --start-period=1m \
-# #     CMD if [[ "${BUILD_TARGET}" == 'production' ]]; then certbot_issue.sh verify; else exit 0; fi
+# Define the healthcheck (production only)
+ARG BUILD_TARGET
+HEALTHCHECK --interval=1m30s --timeout=10s --retries=3 --start-period=1m \
+    CMD if [ "${BUILD_TARGET}" = 'production' ]; then node "${GHOST_INSTALL}"/current/healthcheck.js; else exit 0; fi
 
 # Run entrypoint script
 # ENTRYPOINT [ "docker_entrypoint.sh" ]

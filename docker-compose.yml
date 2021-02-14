@@ -92,7 +92,9 @@ services:
       - ./config/nginx/snippets:/var/lib/nginx/snippets:ro
     environment:
       # core ghost settings
-      - url=https://${DOMAINS_BLOG}
+      - url=http://${DOMAINS_BLOG}
+      #TODO: fix image handling over http
+      # - url=https://${DOMAINS_BLOG}
       # - admin=https://${DOMAINS_ADMIN}
       - database__client=mysql
       - database__connection__host=mariadb
