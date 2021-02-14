@@ -160,9 +160,12 @@ main() {
     done
 
     # Initialize content volume, including default theme (Casper)
+    print_status "INFO Initializing content folder"
     folders=$(echo "${CONTENT_FOLDERS}" | sed "s|/|${CONTENT_BASE_DIR}/|g")
     eval "mkdir -p ${folders}"
-    ln -s "${INSTALL_DIR}"/current/content/themes/casper "${CONTENT_BASE_DIR}"/themes/casper
+    print_status "INFO Installing default theme (Casper)"
+    rm -rf "${CONTENT_BASE_DIR}"/themes/casper
+    cp -r "${INSTALL_DIR}"/current/content/themes/casper "${CONTENT_BASE_DIR}"/themes/casper
 
     # Trigger cleanup when receiving stop signal
     trap cleanup EXIT
