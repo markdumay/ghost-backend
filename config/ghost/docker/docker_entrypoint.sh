@@ -128,11 +128,11 @@ sig_cleanup() {
 }
 
 #======================================================================================================================
-# Entrypoint for the script. It deploys the provided nginx templates. The deployed templates are removed when the
-# Docker container is stopped. To this end, an event handler is attached to the INT, QUIT, and TERM signals. The ghost 
-# process runs in the background, while an infinite loop listens for any signals. When a signal is received, the 
-# 'cleanup' function is invoked, which removes the templates and gracefully stops the ghost background process using
-# its PID.
+# Entrypoint for the script. It deploys the provided nginx templates and initializes the content folder. The deployed 
+# templates are removed when the Docker container is stopped. To this end, an event handler is attached to the INT, 
+# QUIT, and TERM signals. The ghost process runs in the background, while an infinite loop listens for any signals. 
+# When a signal is received, the 'cleanup' function is invoked, which removes the templates and gracefully stops the 
+# ghost background process using its PID.
 #======================================================================================================================
 main() {
     # Validate env variables

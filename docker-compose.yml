@@ -87,8 +87,9 @@ services:
       - templates:/etc/nginx/templates
     environment:
       # core ghost settings
-      - url=http://${DOMAINS_BLOG}
       #TODO: fix image handling over http
+      - url=http://${DOMAINS_BLOG}
+      # - url=http://${DOMAINS_BLOG}
       # - url=https://${DOMAINS_BLOG}
       # - admin=https://${DOMAINS_ADMIN}
       - database__client=mysql

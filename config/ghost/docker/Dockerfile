@@ -155,6 +155,6 @@ HEALTHCHECK --interval=1m30s --timeout=10s --retries=3 --start-period=1m \
 # Run entrypoint script
 ENTRYPOINT [ "docker_entrypoint.sh" ]
 
-# Define default command and port
+# Define default port
 ARG GHOST_PORT
 EXPOSE "${GHOST_PORT}"
