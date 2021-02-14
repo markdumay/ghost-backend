@@ -127,7 +127,6 @@ RUN set -eu; \
         -d /tmp \
         -v "${GHOST_CONTENT}" \
         -v /etc/nginx/templates \
-        -d "${GHOST_INSTALL}" \
         -f /usr/local/sbin/docker_entrypoint.sh \
         -U node \
 		-k ln \

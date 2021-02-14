@@ -29,17 +29,11 @@ services:
         WAIT_VERSION: "${WAIT_VERSION}"
         NODE_MAJOR_VERSION: "${NODE_MAJOR_VERSION}"
         ALPINE_VERSION: "${ALPINE_VERSION}"
+    read_only: true
+    volumes:
+      - type: tmpfs
+        target: /tmp
 
-
-
-    # read_only: true
-    # volumes:
-    #   - type: tmpfs
-    #     target: /tmp
-    #   - type: tmpfs
-    #     target: /var/lib/nginx/conf.d
-    #   - type: tmpfs
-    #     target: /var/cache/nginx
     # deploy:
     #   restart_policy:
     #     condition: on-failure
