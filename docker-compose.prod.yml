@@ -13,6 +13,9 @@ services:
         # BUILD_FLAGS: --add-shell --read-only
         BUILD_TARGET: production
         MARIADB_VERSION: "${MARIADB_VERSION}"
+    # deploy:
+    #   placement:
+    #     constraints: [node.role == manager]
 
   ghost:
     build:
