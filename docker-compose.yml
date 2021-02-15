@@ -74,6 +74,7 @@ services:
 
   ghost:
     image: "markdumay/ghost:${BUILD_VERSION:?version}${IMAGE_SUFFIX:-}"
+    hostname: ghost
     restart: unless-stopped
     links:
       - mariadb
