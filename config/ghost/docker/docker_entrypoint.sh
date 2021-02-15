@@ -4,8 +4,8 @@
 # Title         : docker_entrypoint.sh
 # Description   : Runs Ghost using nginx as proxy
 # Author        : Mark Dumay
-# Date          : February 14th, 2020
-# Version       : 1.2.0
+# Date          : February 15th, 2020
+# Version       : 1.2.1
 # Usage         : ENTRYPOINT ["docker_entrypoint.sh"]
 # Repository    : https://github.com/markdumay/ghost-backend.git
 #======================================================================================================================
@@ -94,11 +94,10 @@ cleanup() {
     err=$?
 
     # Remove the previously deployed templates
-    # TODO: fix
     print_status "INFO Removing nginx configuration templates"
-    templates="${DOMAINS_BLOG}".conf.template
+    templates="${TEMPLATE_TARGET_DIR}/${DOMAINS_BLOG}".conf.template
     snippets=$(find "${SNIPPETS_SOURCE_DIR}"/*.conf -maxdepth 1 -print0 | xargs -0 -n1 basename)
-    snippets=$(echo "${snippets}" | sed -e "s|^|${TEMPLATE_SNIPPETS_DIR}/|")
+    snippets=$(echo "${snippets}" | sed -e "s|^|${SNIPPETS_TARGET_DIR}/|")
     templates=$(printf "%s\n%s" "${templates}" "${snippets}")
     echo "${templates}"| while read -r file
     do
@@ -142,14 +141,12 @@ main() {
     [ "${CACHING}" != 'cached' ] && [ "${CACHING}" != 'uncached' ] && terminate "Invalid caching value: ${CACHING}"
 
     # Copy nginx templates and snippets
-    # TODO: test
     print_status "INFO Deploying nginx configuration templates (${CACHING})"
     mkdir -p "${SNIPPETS_TARGET_DIR}"
     cp "${TEMPLATE_SOURCE_DIR}/ghost-${CACHING}".conf.template "${TEMPLATE_TARGET_DIR}/${DOMAINS_BLOG}".conf.template
     cp "${SNIPPETS_SOURCE_DIR}"/*.conf "${SNIPPETS_TARGET_DIR}"/
 
     # Display deployed files
-    # TODO: test
     templates="${TEMPLATE_TARGET_DIR}/${DOMAINS_BLOG}".conf.template
     snippets=$(find "${SNIPPETS_TARGET_DIR}"/*.conf -maxdepth 1 -print0 | xargs -0 -n1 basename)
     snippets=$(echo "${snippets}" | sed -e "s|^|${SNIPPETS_TARGET_DIR}/|")
