@@ -24,9 +24,10 @@ services:
         BUILD_VERSION: "${BUILD_VERSION}"
         BUILD_UID: "${BUILD_UID}"
         BUILD_GID: "${BUILD_GID}"
-        # BUILD_FLAGS: --add-shell --read-only
+        BUILD_FLAGS: --add-shell
         BUILD_TARGET: test
         MARIADB_VERSION: "${MARIADB_VERSION}"
+        MARIADB_ALPINE_VERSION: "${MARIADB_ALPINE_VERSION}"
 
   ghost:
     build:
@@ -42,8 +43,4 @@ services:
         GHOST_CLI_VERSION: "${GHOST_CLI_VERSION}"
         WAIT_VERSION: "${WAIT_VERSION}"
         NODE_MAJOR_VERSION: "${NODE_MAJOR_VERSION}"
-        ALPINE_VERSION: "${ALPINE_VERSION}"
-
-    # volumes:
-    #   - type: tmpfs
-    #     target: /tmp
+        GHOST_ALPINE_VERSION: "${GHOST_ALPINE_VERSION}"

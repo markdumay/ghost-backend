@@ -31,20 +31,23 @@ services:
   mariadb:
     image: "markdumay/mariadb:${BUILD_VERSION:?version}${IMAGE_SUFFIX:-}"
     hostname: mariadb
-    command: --max_allowed_packet=256M
+    # command: --max_allowed_packet=256M
+    # TODO: test
+    # command: --bind-address=127.0.0.1
+    command: --skip-name-resolve --skip-networking=0
     restart: unless-stopped
     networks:
       - backend
-    volumes:
-      # make mariadb database data, backups, and logs persistent
-      - mariadb_data:/var/lib/mysql
-      # - ./data/mariadb/mysql:/var/lib/mysql
-      - ./data/mariadb/backup:/var/backup/mariadb
-      - ./data/mariadb/log:/var/log
-      # cross-reference Ghost images, logs, settings, and themes for remote backup
-      - ./data/ghost:/var/backup/ghost
-      # add folder with initialization script to create backup database user and password
-      - ./config/mariadb/init:/docker-entrypoint-initdb.d:ro
+    # volumes:
+      # # make mariadb database data, backups, and logs persistent
+      # - mariadb_data:/var/lib/mysql
+      # # - ./data/mariadb/mysql:/var/lib/mysql
+      # - ./data/mariadb/backup:/var/backup/mariadb
+      # - ./data/mariadb/log:/var/log
+      # # cross-reference Ghost images, logs, settings, and themes for remote backup
+      # - ./data/ghost:/var/backup/ghost
+      # # add folder with initialization script to create backup database user and password
+      # - ./config/mariadb/init:/docker-entrypoint-initdb.d:ro
     environment:
       # database settings
       - MYSQL_DATABASE=${DB_NAME}

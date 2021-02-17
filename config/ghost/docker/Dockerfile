@@ -11,20 +11,20 @@ ARG BUILD_USER='cms'
 ARG BUILD_FLAGS=''
 ARG BUILD_VERSION
 ARG BUILD_TARGET='test'
-ARG ALPINE_VERSION
+ARG GHOST_ALPINE_VERSION
 ARG NODE_MAJOR_VERSION
 ARG GHOST_VERSION
 ARG GHOST_CLI_VERSION
 ARG GHOST_PORT=2368
 
+
 #======================================================================================================================
 # Ghost builder image
 #======================================================================================================================
-FROM node:"${NODE_MAJOR_VERSION?version}"-alpine"${ALPINE_VERSION?version}" as builder
+FROM node:"${NODE_MAJOR_VERSION?version}"-alpine"${GHOST_ALPINE_VERSION?version}" as builder
 
-#Grab su-exec for easy step-down from root
+# Grab su-exec for easy step-down from root
 RUN apk add --no-cache 'su-exec>=0.2'
-
 
 # Install Ghost CLI
 ARG GHOST_CLI_VERSION
@@ -90,7 +90,7 @@ RUN set -eu; \
 # Main image
 #======================================================================================================================
 
-FROM node:"${NODE_MAJOR_VERSION?version}"-alpine"${ALPINE_VERSION?version}"
+FROM node:"${NODE_MAJOR_VERSION?version}"-alpine"${GHOST_ALPINE_VERSION?version}"
 
 ENV GHOST_INSTALL /var/lib/ghost
 ENV GHOST_CONTENT /var/lib/ghost/content

@@ -10,9 +10,20 @@ services:
         BUILD_VERSION: "${BUILD_VERSION}"
         BUILD_UID: "${BUILD_UID}"
         BUILD_GID: "${BUILD_GID}"
-        # BUILD_FLAGS: --add-shell --read-only
+        BUILD_FLAGS: --add-shell --read-only
         BUILD_TARGET: production
         MARIADB_VERSION: "${MARIADB_VERSION}"
+        MARIADB_ALPINE_VERSION: "${MARIADB_ALPINE_VERSION}"
+    read_only: true
+    volumes:
+      - type: tmpfs
+        target: /var/tmp
+      - type: tmpfs
+        target: /var/run/mysqld
+      - type: tmpfs
+        target: /run/mysqld
+      - type: tmpfs
+        target: /docker-entrypoint-initdb.d
     # deploy:
     #   placement:
     #     constraints: [node.role == manager]
@@ -31,7 +42,7 @@ services:
         GHOST_CLI_VERSION: "${GHOST_CLI_VERSION}"
         WAIT_VERSION: "${WAIT_VERSION}"
         NODE_MAJOR_VERSION: "${NODE_MAJOR_VERSION}"
-        ALPINE_VERSION: "${ALPINE_VERSION}"
+        GHOST_ALPINE_VERSION: "${GHOST_ALPINE_VERSION}"
     read_only: true
     volumes:
       - type: tmpfs
