@@ -125,9 +125,9 @@ RUN set -eu; \
         -n "${BUILD_USER}" \
         -u "${BUILD_UID}" \
         -g "${BUILD_GID}" \
-        -d /tmp \
         -v "${GHOST_CONTENT}" \
         -v /etc/nginx/templates \
+        -d /tmp \
         -f /usr/local/sbin/docker_entrypoint.sh \
         -U node \
 		-k wait-for \
