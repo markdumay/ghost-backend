@@ -14,16 +14,6 @@ secrets:
   db_backup_password:
     file: secrets/db_backup_password
     external: false
-  restic_password:
-    file: secrets/restic_password
-    external: false
-  STAGE_B2_ACCOUNT_ID:
-    file: secrets/STAGE_B2_ACCOUNT_ID
-    external: false
-  STAGE_B2_ACCOUNT_KEY:
-    file: secrets/STAGE_B2_ACCOUNT_KEY
-    external: false
-
 
 services:
   mariadb:
