@@ -26,12 +26,6 @@ secrets:
     file: secrets/db_backup_user
   db_backup_password:
     file: secrets/db_backup_password
-  restic_password:
-    file: secrets/restic_password
-  STAGE_B2_ACCOUNT_ID:
-    file: secrets/STAGE_B2_ACCOUNT_ID
-  STAGE_B2_ACCOUNT_KEY:
-    file: secrets/STAGE_B2_ACCOUNT_KEY
 
 services:
   mariadb:
@@ -61,18 +55,13 @@ services:
       - MYSQL_BACKUP_PASSWORD_FILE=/run/secrets/db_backup_password
       # backup settings
       - BACKUP=${BACKUP}
-      - RESTIC_REPOSITORY=${RESTIC_REPOSITORY}
-      - RESTIC_PASSWORD_FILE=/run/secrets/restic_password
     secrets:
       - db_root_password
       - db_user
       - db_password
       - db_backup_user
       - db_backup_password
-      - restic_password
-      - STAGE_B2_ACCOUNT_ID
-      - STAGE_B2_ACCOUNT_KEY
-    
+   
 
   ghost:
     image: "markdumay/ghost:${BUILD_VERSION:?version}${IMAGE_SUFFIX:-}"
