@@ -169,7 +169,7 @@ main() {
     trap 'kill ${!}; sig_cleanup' INT QUIT TERM
 
     # Wait for dependencies and then run Ghost in background; store PID for future use
-    wait && eval "${NODE_CMD}" & pid="$!"
+    wait-for && eval "${NODE_CMD}" & pid="$!"
 
     # Listen for any signals indefinitely
     while true

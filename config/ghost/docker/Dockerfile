@@ -102,7 +102,8 @@ ENV NODE_ENV production
 # TODO: compile wait from source
 ARG WAIT_VERSION
 COPY config/ghost/docker/docker_entrypoint.sh dbm/utils/harden_alpine.sh /usr/local/sbin/
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/"${WAIT_VERSION?version}"/wait /usr/local/sbin/wait
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/"${WAIT_VERSION?version}"/wait \
+	/usr/local/sbin/wait-for
 
 # Copy the builder files
 COPY --from=builder "${GHOST_INSTALL}" "${GHOST_INSTALL}"
@@ -119,7 +120,7 @@ RUN set -eu; \
     rm -rf /var/cache/apk/* /tmp; \
     chmod +x /usr/local/sbin/docker_entrypoint.sh; \
     chmod +x /usr/local/sbin/harden_alpine.sh; \
-    chmod +x /usr/local/sbin/wait; \
+    chmod +x /usr/local/sbin/wait-for; \
     /usr/local/sbin/harden_alpine.sh harden \
         -n "${BUILD_USER}" \
         -u "${BUILD_UID}" \
@@ -129,7 +130,7 @@ RUN set -eu; \
         -v /etc/nginx/templates \
         -f /usr/local/sbin/docker_entrypoint.sh \
         -U node \
-		-k ln \
+		-k wait-for \
         "${BUILD_FLAGS}";
 
 #TODO: copy configuration files
